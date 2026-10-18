@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowUpRight, CalendarDays, Database, ExternalLink, RefreshCw, Search, ShieldCheck } from "lucide-react";
 
 type Research = {
@@ -39,7 +39,7 @@ export default function PresidentialResearchPage() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
 
-  async function loadCatalog() {
+  const loadCatalog = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -54,9 +54,9 @@ export default function PresidentialResearchPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  useEffect(() => { void loadCatalog(); }, []);
+  useEffect(() => { void loadCatalog(); }, [loadCatalog]);
 
   const records = useMemo(() => {
     const term = query.trim().toLocaleLowerCase("pt-BR");
