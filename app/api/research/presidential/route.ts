@@ -12,7 +12,7 @@ const TSE_DATASET_PAGE =
 const PESQELE_URL = "https://pesqele-divulgacao.tse.jus.br/";
 const MAX_DOWNLOAD_BYTES = 80 * 1024 * 1024;
 
-type CkanResource = { name?: string; format?: string; url?: string; mimetype?: string };
+type CkanResource = { name?: string; format?: string; url?: string; mimetype?: string; last_modified?: string };
 type CsvRow = Record<string, string>;
 
 function key(value: string): string {
