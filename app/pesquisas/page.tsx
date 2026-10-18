@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, CalendarDays, Database, ExternalLink, RefreshCw, Search, ShieldCheck } from "lucide-react";
 
 type Research = {
@@ -70,7 +71,7 @@ export default function PresidentialResearchPage() {
   return (
     <main className="research-page">
       <div className="research-wrap">
-        <a className="research-back" href="/"><ArrowLeft size={16} /> Voltar ao Pulso Cívico</a>
+        <Link className="research-back" href="/"><ArrowLeft size={16} /> Voltar ao Pulso Cívico</Link>
         <header className="research-header">
           <div className="research-eyebrow"><Database size={15} /> FONTE PÚBLICA · TSE 2026</div>
           <h1>Pesquisas para<br /><span>a Presidência.</span></h1>
