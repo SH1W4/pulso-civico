@@ -100,7 +100,7 @@ export async function GET() {
     }) as CsvRow[];
 
     const polls = rows.filter(presidential).map((row) => ({
-      registration: field(row, "NR_PESQUISA", "NR_REGISTRO", "DS_REGISTRO", "CD_REGISTRO", "SQ_PESQUISA") || "Registro não identificado",
+      registration: field(row, "NR_PESQUISA", "NR_REGISTRO", "DS_REGISTRO", "CD_REGISTRO") || "Registro não identificado",
       institute: field(row, "NM_EMPRESA", "NM_ENTIDADE", "NM_EMPRESA_PESQUISA", "EMPRESA") || "Instituto não informado",
       contractor: field(row, "NM_ENTIDADE", "NM_CONTRATANTE", "CONTRATANTE") || null,
       registeredAt: parseDate(field(row, "DT_REGISTRO", "DT_CADASTRO")),
