@@ -193,7 +193,7 @@ export default function Home() {
             <button className="button-quiet" onClick={() => { setActiveTab("participar"); document.getElementById("experience")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><Vote size={16} /> Participar voluntariamente</button>
           </div>
           {showInfo && (
-            <div className="inline-note"><Info size={17} /><p>Este protótipo é local e demonstrativo. Suas respostas não são enviadas nem armazenadas em um servidor. Os gráficos usam números ilustrativos.</p></div>
+            <div className="inline-note"><Info size={17} /><p>A participação é voluntária. As consultas comunitárias são armazenadas para gerar agregados após o limiar mínimo; não representam automaticamente o eleitorado. O catálogo do TSE exibe metadados públicos, não percentuais inferidos.</p></div>
           )}
           <div className="hero-proof">
             <div className="proof-icon"><ShieldCheck size={17} /></div>
@@ -297,7 +297,7 @@ export default function Home() {
                 <div className="results-foot"><span>{poll.total ?? "Menos de 5"} respostas publicáveis</span><button className="button-quiet" onClick={() => { setMissionIndex(poll.id === "prioridades" ? 0 : 1); setSelected(null); setActiveTab("participar"); document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" }); }}>Participar ↗</button></div>
               </section>)}
             </article>
-            <aside className="results-aside"><span className="results-aside-icon"><ShieldCheck size={23} /></span><h3>Dados precisam de contexto.</h3><p>Uma consulta aberta reúne pessoas que decidiram participar. Isso não torna automaticamente seus resultados representativos de todo o eleitorado.</p><div className="aside-rule" /><div className="aside-stat"><strong>Aberta</strong><span>Consulta comunitária voluntária; a coleta persistente ainda será ativada.</span></div><button className="button-secondary" onClick={() => setActiveTab("participar")}>Participar voluntariamente <ArrowRight size={15} /></button></aside>
+            <aside className="results-aside"><span className="results-aside-icon"><ShieldCheck size={23} /></span><h3>Dados precisam de contexto.</h3><p>Uma consulta aberta reúne pessoas que decidiram participar. Isso não torna automaticamente seus resultados representativos de todo o eleitorado.</p><div className="aside-rule" /><div className="aside-stat"><strong>Aberta</strong><span>Consulta comunitária voluntária; resultados publicados apenas em agregados.</span></div><button className="button-secondary" onClick={() => setActiveTab("participar")}>Participar voluntariamente <ArrowRight size={15} /></button></aside>
           </div>
         )}
       </section>
@@ -316,7 +316,7 @@ export default function Home() {
         <p>Uma iniciativa de participação cívica com transparência.</p>
         <div className="footer-right"><span><span className="footer-dot" /> PROTÓTIPO INTERATIVO</span><span>© 2026 PULSO CÍVICO</span></div>
       </footer>
-      <div className="disclaimer"><Info size={14} /><span>O catálogo consulta metadados públicos do TSE. A consulta comunitária é voluntária, exibe apenas agregados e não representa automaticamente a opinião do eleitorado brasileiro.</span></div>
+      <div className="disclaimer"><Info size={14} /><span>O catálogo consulta metadados públicos do TSE. O catálogo consulta metadados públicos do TSE. A consulta comunitária é voluntária, exibe apenas agregados e não representa automaticamente a opinião do eleitorado brasileiro.</span></div>
     </main>
   );
 }
