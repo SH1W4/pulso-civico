@@ -48,3 +48,7 @@ npm start
 6. Configurar CI para lint, typecheck e build.
 
 Consulte `docs/PRODUCT-SCOPE.md`, `docs/ARCHITECTURE.md` e `docs/DATA-GOVERNANCE.md`.
+
+## Consultas comunitárias persistentes
+
+A coleta voluntária usa PostgreSQL e a API de servidor em `/api/community/polls`. Antes de ativá-la, configure `DATABASE_URL` e `POLL_VOTER_HASH_SECRET` no ambiente do Vercel e execute `docs/sql/community-polls.sql`. Veja `docs/COMMUNITY-POLLING-SETUP.md` para configuração, limites e cuidados de privacidade. A interface atualiza agregados a cada 15 segundos e só publica distribuições a partir de cinco respostas por consulta. A proteção por identificador de navegador reduz duplicação, mas não prova identidade nem impede abuso sofisticado.

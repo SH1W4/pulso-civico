@@ -75,6 +75,24 @@ export default function Home() {
   const [completed, setCompleted] = useState<number[]>([]);
   const [showInfo, setShowInfo] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [communityPolls, setCommunityPolls] = useState<Array<{id:string;title:string;description:string;total:number|null;resultsVisible:boolean;minimumResponsesToPublish:number;results:Array<{optionId:string;label:string;votes:number;percentage:number}>}>>([]);
+  const [communityLoading, setCommunityLoading] = useState(true);
+  const [communityError, setCommunityError] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [voteMessage, setVoteMessage] = useState<string | null>(null);
+  const [voteBusy, setVoteBusy] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const load = () => fetch("/api/community/polls", { cache: "no-store" })
+      .then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data.error || "Falha ao consultar resultados."); return data; })
+      .then((data) => { if (active) { setCommunityPolls(data.polls ?? []); setCommunityError(null); } })
+      .catch((error: unknown) => { if (active) setCommunityError(error instanceof Error ? error.message : "Falha ao carregar resultados."); })
+      .finally(() => { if (active) setCommunityLoading(false); });
+    void load();
+    const timer = window.setInterval(() => { void load(); }, 15000);
+    return () => { active = false; window.clearInterval(timer); };
+  }, []);
 
   const mission = missions[missionIndex];
   const isComplete = completed.includes(missionIndex);
@@ -97,8 +115,27 @@ export default function Home() {
     return () => { active = false; };
   }, []);
 
-  function submitAnswer() {
-    if (selected === null || isComplete) return;
+  async function submitAnswer() {
+    if (selected === null || isComplete || voteBusy) return;
+    if (missionIndex < 2) {
+      if (!consent) { setVoteMessage("Leia e aceite o aviso de privacidade antes de enviar."); return; }
+      setVoteBusy(true); setVoteMessage(null);
+      try {
+        let voterToken = window.localStorage.getItem("pulso-community-voter-token");
+        if (!voterToken) { voterToken = window.crypto.randomUUID(); window.localStorage.setItem("pulso-community-voter-token", voterToken); }
+        const pollId = missionIndex === 0 ? "prioridades" : "transparencia";
+        const optionIds = missionIndex === 0 ? ["evolucao", "institutos", "territorio", "apuracao"] : ["metodologia", "fonte", "margem", "historico"];
+        const response = await fetch("/api/community/polls", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pollId, optionId: optionIds[selected], voterToken, consent: true }) });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Não foi possível registrar sua resposta.");
+        setVoteMessage("Resposta registrada. Os resultados agregados serão atualizados automaticamente.");
+        const results = await fetch("/api/community/polls", { cache: "no-store" }).then((r) => r.json());
+        setCommunityPolls(results.polls ?? []);
+      } catch (error) {
+        setVoteMessage(error instanceof Error ? error.message : "Falha ao registrar resposta."); setVoteBusy(false); return;
+      }
+      setVoteBusy(false);
+    }
     setCompleted((previous) => [...previous, missionIndex]);
   }
 
@@ -215,10 +252,15 @@ export default function Home() {
                 {missionIndex === 2 && selected !== null && (
                   <div className="learning-note"><Sparkles size={17} /><p>{selected === mission.correct ? "Isso mesmo. O recrutamento voluntário não garante representatividade: o perfil de quem responde pode diferir do eleitorado." : "Pense em quem decide participar e em quem não chega a responder. O tamanho da amostra, sozinho, não elimina esse viés."}</p></div>
                 )}
+                {missionIndex < 2 && <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginTop: 14, color: "var(--muted)", fontSize: 12 }}>
+                  <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+                  <span>Li o aviso de privacidade e autorizo o registro da resposta para gerar resultados agregados. A consulta é voluntária e não representa automaticamente o eleitorado.</span>
+                </label>}
+                {voteMessage && <div className="inline-note" role="status"><Info size={17} /><p>{voteMessage}</p></div>}
                 <div className="mission-footer">
-                  <span><LockKeyhole size={14} /> Sem envio ao servidor</span>
+                  <span><LockKeyhole size={14} /> {missionIndex < 2 ? "Resposta voluntária e agregada" : "Missão educativa local"}</span>
                   {!isComplete ? (
-                    <button className="button-primary" disabled={selected === null} onClick={submitAnswer}>Confirmar <ArrowRight size={16} /></button>
+                    <button className="button-primary" disabled={selected === null || voteBusy || (missionIndex < 2 && !consent)} onClick={submitAnswer}>{voteBusy ? "Enviando…" : "Confirmar"} <ArrowRight size={16} /></button>
                   ) : (
                     <button className="button-primary" onClick={nextMission}>Próxima missão <ArrowRight size={16} /></button>
                   )}
@@ -245,10 +287,15 @@ export default function Home() {
         ) : (
           <div className="results-grid">
             <article className="results-card">
-              <div className="results-title-row"><div><span className="mission-tag">FONTE OFICIAL · TSE</span><h3>Pesquisas presidenciais registradas</h3></div><span className="demo-stamp"><span /> DADOS PÚBLICOS</span></div>
-              <p className="results-subtitle">Catálogo de registros encontrados na base pública do TSE. Percentuais de intenção de voto não são inferidos deste catálogo: consulte a publicação ou o relatório de cada instituto.</p>
-              {pollsLoading ? <p className="results-subtitle">Consultando a fonte oficial do TSE…</p> : pollsError ? <div className="demo-warning"><Info size={17} /><span>{pollsError} Consulte também a fonte oficial abaixo.</span></div> : polls.length === 0 ? <p className="results-subtitle">A fonte respondeu, mas ainda não há registros presidenciais que o sistema consiga identificar com segurança.</p> : <div className="bar-list">{polls.slice(0, 8).map((poll, index) => <div className="bar-item" key={`${poll.registration}-${index}`}><div className="bar-label"><span>{poll.institute} · {poll.registration}</span><strong>{poll.sampleSize ? `${poll.sampleSize.toLocaleString("pt-BR")} entrevistas` : "Amostra não informada"}</strong></div><p className="results-subtitle">{[poll.fieldStart && `Campo: ${poll.fieldStart}`, poll.fieldEnd && `até ${poll.fieldEnd}`, poll.registeredAt && `Registro: ${poll.registeredAt}`, poll.state && `Abrangência: ${poll.state}`].filter(Boolean).join(" · ") || "Detalhes disponíveis na fonte oficial."}</p></div>)}</div>}
-              <div className="results-foot"><span><Radio size={15} /> {polls.length} registro(s) identificados</span><a href="/pesquisas">Abrir catálogo completo ↗</a></div>
+              <div className="results-title-row"><div><span className="mission-tag">CONSULTA COMUNITÁRIA</span><h3>O que a comunidade quer explorar?</h3></div><span className="demo-stamp"><span /> RESPOSTAS VOLUNTÁRIAS</span></div>
+              <p className="results-subtitle">Resultados agregados de consultas voluntárias. A atualização é automática a cada 15 segundos; não representam automaticamente o eleitorado.</p>
+              {communityLoading && <p className="results-subtitle">Carregando resultados comunitários…</p>}
+              {communityError && <div className="demo-warning"><Info size={17} /><span>{communityError} Configure o banco de dados e execute a migração SQL para ativar a coleta.</span></div>}
+              {!communityLoading && !communityError && communityPolls.map((poll) => <section key={poll.id} style={{ marginTop: 20 }}>
+                <h3>{poll.title}</h3><p className="results-subtitle">{poll.description}</p>
+                {!poll.resultsVisible ? <div className="demo-warning"><Info size={17} /><span>Resultados ocultos até atingir pelo menos {poll.minimumResponsesToPublish ?? 5} respostas. Nenhum percentual fictício é exibido.</span></div> : <div className="bar-list">{poll.results.map((item, index) => <div className="bar-item" key={item.optionId}><div className="bar-label"><span>{item.label}</span><strong>{item.percentage.toLocaleString("pt-BR")}% · {item.votes}</strong></div><div className="bar-track"><span className={["mint","violet","amber","blue"][index % 4]} style={{ width: item.percentage + "%" }} /></div></div>)}</div>}
+                <div className="results-foot"><span>{poll.total ?? "Menos de 5"} respostas publicáveis</span><button className="button-quiet" onClick={() => { setMissionIndex(poll.id === "prioridades" ? 0 : 1); setSelected(null); setActiveTab("participar"); document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" }); }}>Participar ↗</button></div>
+              </section>)}
             </article>
             <aside className="results-aside"><span className="results-aside-icon"><ShieldCheck size={23} /></span><h3>Dados precisam de contexto.</h3><p>Uma consulta aberta reúne pessoas que decidiram participar. Isso não torna automaticamente seus resultados representativos de todo o eleitorado.</p><div className="aside-rule" /><div className="aside-stat"><strong>Aberta</strong><span>Consulta comunitária voluntária; a coleta persistente ainda será ativada.</span></div><button className="button-secondary" onClick={() => setActiveTab("participar")}>Participar voluntariamente <ArrowRight size={15} /></button></aside>
           </div>
@@ -269,7 +316,7 @@ export default function Home() {
         <p>Uma iniciativa de participação cívica com transparência.</p>
         <div className="footer-right"><span><span className="footer-dot" /> PROTÓTIPO INTERATIVO</span><span>© 2026 PULSO CÍVICO</span></div>
       </footer>
-      <div className="disclaimer"><Info size={14} /><span>O catálogo consulta metadados públicos do TSE. A consulta comunitária é voluntária e não representa automaticamente a opinião do eleitorado brasileiro; a coleta de respostas ainda não está ativada.</span></div>
+      <div className="disclaimer"><Info size={14} /><span>O catálogo consulta metadados públicos do TSE. A consulta comunitária é voluntária, exibe apenas agregados e não representa automaticamente a opinião do eleitorado brasileiro.</span></div>
     </main>
   );
 }
