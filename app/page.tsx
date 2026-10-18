@@ -75,7 +75,7 @@ export default function Home() {
   const [completed, setCompleted] = useState<number[]>([]);
   const [showInfo, setShowInfo] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [communityPolls, setCommunityPolls] = useState<any[]>([]);
+  const [communityPolls, setCommunityPolls] = useState<Array<{id:string;title:string;description:string;total:number|null;resultsVisible:boolean;minimumResponsesToPublish:number;results:Array<{optionId:string;label:string;votes:number;percentage:number}>}>>([]);
   const [communityLoading, setCommunityLoading] = useState(true);
   const [communityError, setCommunityError] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
@@ -293,7 +293,7 @@ export default function Home() {
               {communityError && <div className="demo-warning"><Info size={17} /><span>{communityError} Configure o banco de dados e execute a migração SQL para ativar a coleta.</span></div>}
               {!communityLoading && !communityError && communityPolls.map((poll) => <section key={poll.id} style={{ marginTop: 20 }}>
                 <h3>{poll.title}</h3><p className="results-subtitle">{poll.description}</p>
-                {!poll.resultsVisible ? <div className="demo-warning"><Info size={17} /><span>Resultados ocultos até atingir pelo menos {poll.minimumResponsesToPublish ?? 5} respostas. Nenhum percentual fictício é exibido.</span></div> : <div className="bar-list">{poll.results.map((item: any, index: number) => <div className="bar-item" key={item.optionId}><div className="bar-label"><span>{item.label}</span><strong>{item.percentage.toLocaleString("pt-BR")}% · {item.votes}</strong></div><div className="bar-track"><span className={["mint","violet","amber","blue"][index % 4]} style={{ width: item.percentage + "%" }} /></div></div>)}</div>}
+                {!poll.resultsVisible ? <div className="demo-warning"><Info size={17} /><span>Resultados ocultos até atingir pelo menos {poll.minimumResponsesToPublish ?? 5} respostas. Nenhum percentual fictício é exibido.</span></div> : <div className="bar-list">{poll.results.map((item, index) => <div className="bar-item" key={item.optionId}><div className="bar-label"><span>{item.label}</span><strong>{item.percentage.toLocaleString("pt-BR")}% · {item.votes}</strong></div><div className="bar-track"><span className={["mint","violet","amber","blue"][index % 4]} style={{ width: item.percentage + "%" }} /></div></div>)}</div>}
                 <div className="results-foot"><span>{poll.total ?? "Menos de 5"} respostas publicáveis</span><button className="button-quiet" onClick={() => { setMissionIndex(poll.id === "prioridades" ? 0 : 1); setSelected(null); setActiveTab("participar"); document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" }); }}>Participar ↗</button></div>
               </section>)}
             </article>
