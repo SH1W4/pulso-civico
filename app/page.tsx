@@ -126,12 +126,12 @@ export default function Home() {
         </nav>
         <div className="topbar-actions">
           <span className="demo-pill"><span /> MODO DEMONSTRAÇÃO</span>
-          <button className="icon-button mobile-menu" aria-label="Abrir menu" onClick={() => setShowMenu((value) => !value)}>{showMenu ? <X size={19} /> : <Menu size={19} />}</button>
+          <button className="icon-button mobile-menu" aria-label={showMenu ? "Fechar menu" : "Abrir menu"} aria-expanded={showMenu} aria-controls="mobile-navigation" onClick={() => setShowMenu((value) => !value)}>{showMenu ? <X size={19} /> : <Menu size={19} />}</button>
         </div>
       </header>
 
       {showMenu && (
-        <nav className="mobile-nav" aria-label="Menu móvel">
+        <nav id="mobile-navigation" className="mobile-nav" aria-label="Menu móvel">
           <button onClick={() => { setActiveTab("participar"); setShowMenu(false); }}>Participar</button>
           <button onClick={() => { setActiveTab("resultados"); setShowMenu(false); }}>Explorar dados</button>
           <a href="#camadas" onClick={() => setShowMenu(false)}>Camadas de dados</a>
