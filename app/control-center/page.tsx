@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   Activity,
   ArrowDownRight,
@@ -71,7 +72,7 @@ export default function ControlCenterPage() {
   return (
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
-        <a className={styles.brand} href="/" aria-label="Pulso Cívico — página inicial">
+        <Link className={styles.brand} href="/" aria-label="Pulso Cívico — página inicial">
           <span className={styles.brandMark}><Radio size={21} /></span>
           <span className={styles.brandName}>PULSO<span>.</span><small>CÍVICO / LAB</small></span>
         </a>
