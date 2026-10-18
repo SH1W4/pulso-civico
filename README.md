@@ -4,10 +4,10 @@ Módulo de participação cívica e transparência do Observatório Eleitoral.
 
 ## Interfaces
 
-- **Página de participação:** `/` — protótipo interativo com missões educativas e resultados explicitamente fictícios.
-- **Centro de controle:** `/control-center` — painel operacional com estado das entregas, roadmap, PRs do GitHub e laboratório de experiência.
+- **Experiência pública:** `/` — produto principal; participação educativa demonstrativa e apresentação explícita das três camadas de dados.
+- **Centro de controle:** `/control-center` — ferramenta interna de acompanhamento de roadmap, CI e PRs; não é a experiência pública.
 
-Estado atual: a interface pública de participação continua demonstrativa; respostas não são enviadas nem persistidas nessa página. O backend comunitário está em revisão por PR e permanece desabilitado por padrão até completar configuração, privacidade, retenção e revisão de segurança.
+Estado atual: a página pública não envia nem persiste respostas. A API comunitária foi integrada à `main`, mas a coleta permanece desabilitada por padrão até concluir aviso de privacidade, retenção/exclusão, configuração e revisão de segurança. Pesquisas eleitorais publicadas e resultados oficiais ainda não estão conectados e devem permanecer em áreas separadas.
 
 ## Executar localmente
 
@@ -30,7 +30,8 @@ npm start
 ## O que o protótipo demonstra
 
 - Interface responsiva em português brasileiro.
-- Navegação entre participação, resultados demonstrativos e centro de controle.
+- Navegação entre participação e resultados demonstrativos, com distinção visível entre consultas comunitárias, pesquisas publicadas e apuração oficial.
+- Centro de controle interno separado da experiência pública.
 - Missões educativas, pontuação apenas local e conquistas demonstrativas.
 - Roadmap com estados explícitos e atalhos para pull requests.
 - Backend proposto com validação, PostgreSQL e resultados agregados, ainda não habilitado para coleta pública.
@@ -46,11 +47,11 @@ npm start
 
 ## Próximas entregas
 
-1. Validar visual, responsividade e acessibilidade do centro de controle.
-2. Validar a API comunitária e a migração em ambiente controlado.
-3. Completar e revisar o aviso de privacidade e a política de retenção.
-4. Integrar o fluxo de consentimento e resposta da interface com a API.
-5. Adicionar controles contra abuso e testes automatizados de domínio/API.
-6. Projetar a ingestão separada de pesquisas publicadas e resultados oficiais.
+1. Validar a experiência pública em celular, desktop e acessibilidade.
+2. Revisar as três camadas de dados e manter todos os dados de demonstração claramente rotulados.
+3. Completar e revisar o aviso de privacidade e a política de retenção/exclusão.
+4. Validar a API comunitária e a migração em ambiente controlado antes de habilitar coleta.
+5. Integrar apenas as consultas comunitárias não políticas com consentimento e estados de erro/sucesso.
+6. Projetar ingestões separadas para pesquisas publicadas e resultados oficiais, com proveniência própria.
 
 Consulte `docs/PRODUCT-SCOPE.md`, `docs/ARCHITECTURE.md`, `docs/DATA-GOVERNANCE.md` e `docs/COMMUNITY-FEEDBACK-API.md`.
