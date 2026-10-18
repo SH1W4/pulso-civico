@@ -2,7 +2,15 @@
 
 ## Visão
 
-Pulso Cívico é o módulo de participação voluntária e gamificação educativa associado ao Observatório Eleitoral. Ele permite responder consultas internas e explorar resultados agregados com contexto metodológico claro.
+Pulso Cívico é a experiência pública de participação cívica e transparência associada ao Observatório Eleitoral. A experiência pública é o produto principal; o Centro de Controle é uma ferramenta interna. O MVP deve distinguir consultas comunitárias, pesquisas eleitorais publicadas e resultados oficiais, sem misturar suas origens ou sugerir que uma consulta voluntária representa o eleitorado.
+
+## Camadas de informação
+
+1. **Consultas comunitárias:** feedback voluntário sobre o produto e missões educativas; nunca usadas como intenção de voto.
+2. **Pesquisas eleitorais publicadas:** levantamentos de fontes externas, com instituto, período, metodologia, registro aplicável e limitações.
+3. **Resultados oficiais:** dados da Justiça Eleitoral em fluxo separado, com proveniência e horário de atualização próprios.
+
+Cada camada deve exibir seu estado de disponibilidade. Dados demonstrativos nunca podem ser apresentados como resultados reais nem substituir silenciosamente uma fonte indisponível.
 
 ## Problema
 
