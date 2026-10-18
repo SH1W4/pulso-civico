@@ -41,7 +41,8 @@ const roadmap = [
 const pullRequests = [
   { number: 1, title: "Fundação documental", branch: "feat/mvp-foundation", status: "Merged", color: "green", href: "https://github.com/SH1W4/pulso-civico/pull/1", checks: "Integrada" },
   { number: 2, title: "PWA interativa", branch: "feat/interactive-pwa-prototype", status: "Merged", color: "green", href: "https://github.com/SH1W4/pulso-civico/pull/2", checks: "CI verde" },
-  { number: 3, title: "API comunitária", branch: "feat/community-feedback-backend", status: "Open", color: "amber", href: "https://github.com/SH1W4/pulso-civico/pull/3", checks: "CI verde · revisão pendente" },
+  { number: 3, title: "API comunitária", branch: "feat/community-feedback-backend", status: "Merged", color: "green", href: "https://github.com/SH1W4/pulso-civico/pull/3", checks: "Integrada à main · coleta desabilitada" },
+  { number: 4, title: "Centro de controle", branch: "feat/pulso-control-center-ui", status: "Open", color: "amber", href: "https://github.com/SH1W4/pulso-civico/pull/4", checks: "CI verde · revisão pendente" },
 ];
 
 const priorities = [
@@ -87,7 +88,7 @@ export default function ControlCenterPage() {
         <div className={styles.sidebarSafety}>
           <span className={styles.safetyIcon}><ShieldCheck size={18} /></span>
           <strong>Integridade por padrão</strong>
-          <p>Consulta voluntária, dados identificados e sem recompensa por preferência política.</p>
+          <p>Privacidade por padrão: coleta mínima e nenhuma recompensa por preferência política.</p>
         </div>
         <a className={styles.repoLink} href="https://github.com/SH1W4/pulso-civico" target="_blank" rel="noreferrer"><Code2 size={16} /> Repositório no GitHub <ArrowUpRight size={14} /></a>
       </aside>
@@ -95,20 +96,20 @@ export default function ControlCenterPage() {
       <section className={styles.main}>
         <header className={styles.topbar}>
           <div className={styles.breadcrumb}><span>Workspace</span><ChevronRight size={14} /><strong>{sectionLabel}</strong></div>
-          <div className={styles.topActions}><span className={styles.systemState}><i /> AMBIENTE DE DEMONSTRAÇÃO</span><a href="https://github.com/SH1W4/pulso-civico/pulls" target="_blank" rel="noreferrer" className={styles.topButton}><GitPullRequest size={15} /> Pull requests <ArrowUpRight size={13} /></a></div>
+          <div className={styles.topActions}><span className={styles.systemState}><i /> PAINEL INTERNO · STATUS REGISTRADO</span><a href="https://github.com/SH1W4/pulso-civico/pulls" target="_blank" rel="noreferrer" className={styles.topButton}><GitPullRequest size={15} /> Pull requests <ArrowUpRight size={13} /></a></div>
         </header>
 
         {section === "overview" && (
           <>
             <div className={styles.pageIntro}>
-              <div><div className={styles.eyebrow}><Sparkles size={14} /> CIVIC INTELLIGENCE WORKSPACE</div><h1>O pulso do projeto.<br /><span>Em um só lugar.</span></h1><p>Uma camada operacional para evoluir da demonstração à participação comunitária verificável.</p></div>
+              <div><div className={styles.eyebrow}><Sparkles size={14} /> FERRAMENTA INTERNA / OPERAÇÃO</div><h1>O pulso do projeto.<br /><span>Em um só lugar.</span></h1><p>Painel interno de acompanhamento. A experiência pública em <code>/</code> é o produto principal; este espaço organiza entregas, validações e próximos passos.</p></div>
               <div className={styles.introOrb}><div className={styles.orbRing} /><div className={styles.orbCenter}><Activity size={30} /></div><span className={styles.orbPoint} /></div>
             </div>
 
             <div className={styles.metrics}>
               <article className={styles.metric}><div className={styles.metricTop}><span>MARCO ATUAL</span><Layers3 size={16} /></div><strong>02<span>/05</span></strong><small>Etapas concluídas</small><div className={styles.metricTrack}><i style={{ width: "40%" }} /></div></article>
               <article className={styles.metric}><div className={styles.metricTop}><span>PULL REQUESTS</span><GitPullRequest size={16} /></div><strong>02<span> merged</span></strong><small>Fundação e PWA integradas</small><div className={styles.metricMeta}><Check size={13} /> fluxo por PR ativo</div></article>
-              <article className={styles.metric}><div className={styles.metricTop}><span>QUALIDADE</span><ShieldCheck size={16} /></div><strong>CI<span> verde</span></strong><small>Último ciclo da base validado</small><div className={styles.metricMeta}><Check size={13} /> lint + build</div></article>
+              <article className={styles.metric}><div className={styles.metricTop}><span>QUALIDADE</span><ShieldCheck size={16} /></div><strong>CI<span> verde</span></strong><small>Última execução da PR #4</small><div className={styles.metricMeta}><Check size={13} /> lint + build aprovados</div></article>
               <article className={styles.metric}><div className={styles.metricTop}><span>RESPOSTAS REAIS</span><LockKeyhole size={16} /></div><strong>00</strong><small>Coleta ainda desabilitada</small><div className={`${styles.metricMeta} ${styles.muted}`}><CircleDot size={13} /> sem dados de produção</div></article>
             </div>
 
@@ -119,7 +120,7 @@ export default function ControlCenterPage() {
 
             <div className={styles.bottomGrid}>
               <article className={styles.repoCard}><div className={styles.cardHead}><div><span className={styles.overline}>ATIVIDADE NO GITHUB</span><h3>Entrega incremental</h3></div><span className={styles.githubGlyph}><GitBranch size={18} /></span></div><div className={styles.prList}>{pullRequests.map((pr) => <a href={pr.href} target="_blank" rel="noreferrer" className={styles.prRow} key={pr.number}><span className={styles.prNumber}>#{pr.number}</span><span className={styles.prTitle}><strong>{pr.title}</strong><small>{pr.branch}</small></span><span className={pr.color === "green" ? styles.prMerged : styles.prOpen}>{pr.status}</span><ArrowUpRight size={14} /></a>)}</div><a className={styles.cardFooterLink} href="https://github.com/SH1W4/pulso-civico/pulls" target="_blank" rel="noreferrer">Abrir todas as PRs <ArrowRight size={14} /></a></article>
-              <article className={styles.nextCard}><div className={styles.nextIcon}><Zap size={20} /></div><span className={styles.overline}>PRÓXIMO SALTO</span><h3>Conectar participação real.</h3><p>Fazer a interface conversar com a API, com consentimento explícito e estados de sucesso/erro honestos.</p><button className={styles.primaryButton} onClick={() => chooseSection("experience")}>Explorar experiência <ArrowRight size={15} /></button><div className={styles.nextCardFoot}><span><LockKeyhole size={13} /> coleta fechada</span><span>v0.2 / laboratória</span></div></article>
+              <article className={styles.nextCard}><div className={styles.nextIcon}><Zap size={20} /></div><span className={styles.overline}>PRÓXIMO SALTO</span><h3>Consolidar a experiência pública.</h3><p>Primeiro, deixar claras as três camadas de dados. Depois, conectar apenas as consultas comunitárias não políticas à API, com consentimento e estados honestos.</p><Link className={styles.primaryButton} href="/">Abrir experiência pública <ArrowRight size={15} /></Link><div className={styles.nextCardFoot}><span><LockKeyhole size={13} /> coleta fechada</span><span>v0.2 / laboratória</span></div></article>
             </div>
           </>
         )}
@@ -155,7 +156,7 @@ export default function ControlCenterPage() {
             <div className={styles.engineeringList}>{pullRequests.map((pr) => <article className={styles.engineeringCard} key={pr.number}><div className={styles.engineeringIcon}><GitPullRequest size={20} /></div><div className={styles.engineeringMain}><div className={styles.engineeringTitle}><h3>#{pr.number} · {pr.title}</h3><span className={pr.color === "green" ? styles.statusDone : styles.statusReview}>{pr.status === "Merged" ? "Integrada" : "Aberta"}</span></div><code>{pr.branch}</code><p>{pr.checks}</p></div><a className={styles.openPr} href={pr.href} target="_blank" rel="noreferrer">Ver PR <ArrowUpRight size={14} /></a></article>)}</div>
             <button className={styles.architectureButton} onClick={() => setShowArchitecture((value) => !value)}><Blocks size={17} /> {showArchitecture ? "Ocultar arquitetura" : "Abrir mapa da arquitetura"} <ChevronRight className={showArchitecture ? styles.rotateChevron : ""} size={15} /></button>
             {showArchitecture && <div className={styles.architectureMap}><div><span>01</span><strong>PWA / Next.js</strong><small>Interface e consentimento</small></div><span className={styles.architectureArrow}>↓</span><div><span>02</span><strong>API validada</strong><small>Entrada e regras de domínio</small></div><span className={styles.architectureArrow}>↓</span><div><span>03</span><strong>PostgreSQL</strong><small>Persistência minimizada</small></div><span className={styles.architectureArrow}>↓</span><div><span>04</span><strong>Agregação pública</strong><small>Limiar e metodologia</small></div></div>}
-            <div className={styles.terminalNote}><Terminal size={16} /><span>GitHub Actions · Node.js 20 · ESLint · Next.js build</span><span className={styles.terminalSuccess}><i /> CI verde na API base</span></div>
+            <div className={styles.terminalNote}><Terminal size={16} /><span>GitHub Actions · Node.js 20 · ESLint · Next.js build</span><span className={styles.terminalSuccess}><i /> PR #3 integrada · PR #4 CI verde</span></div>
           </div>
         )}
 
