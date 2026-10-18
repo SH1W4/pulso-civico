@@ -75,7 +75,7 @@ export default function ControlCenterPage() {
         <Link className={styles.brand} href="/" aria-label="Pulso Cívico — página inicial">
           <span className={styles.brandMark}><Radio size={21} /></span>
           <span className={styles.brandName}>PULSO<span>.</span><small>CÍVICO / LAB</small></span>
-        </a>
+        </Link>
         <div className={styles.workspaceLabel}>WORKSPACE <span>v0.2</span></div>
         <nav className={styles.nav} aria-label="Navegação do centro de controle">
           <button className={section === "overview" ? styles.navActive : ""} onClick={() => chooseSection("overview")}><Gauge size={17} />Visão geral</button>
