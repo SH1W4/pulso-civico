@@ -121,18 +121,20 @@ export default function Home() {
         <nav className="desktop-nav" aria-label="Navegação principal">
           <button className={activeTab === "participar" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("participar")}>Participar</button>
           <button className={activeTab === "resultados" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("resultados")}>Explorar dados</button>
+          <a className="nav-link" href="#camadas">Camadas de dados</a>
           <a className="nav-link" href="#sobre">Como funciona</a>
         </nav>
         <div className="topbar-actions">
           <span className="demo-pill"><span /> MODO DEMONSTRAÇÃO</span>
-          <button className="icon-button mobile-menu" aria-label="Abrir menu" onClick={() => setShowMenu((value) => !value)}>{showMenu ? <X size={19} /> : <Menu size={19} />}</button>
+          <button className="icon-button mobile-menu" aria-label={showMenu ? "Fechar menu" : "Abrir menu"} aria-expanded={showMenu} aria-controls="mobile-navigation" onClick={() => setShowMenu((value) => !value)}>{showMenu ? <X size={19} /> : <Menu size={19} />}</button>
         </div>
       </header>
 
       {showMenu && (
-        <nav className="mobile-nav" aria-label="Menu móvel">
+        <nav id="mobile-navigation" className="mobile-nav" aria-label="Menu móvel">
           <button onClick={() => { setActiveTab("participar"); setShowMenu(false); }}>Participar</button>
           <button onClick={() => { setActiveTab("resultados"); setShowMenu(false); }}>Explorar dados</button>
+          <a href="#camadas" onClick={() => setShowMenu(false)}>Camadas de dados</a>
           <a href="#sobre" onClick={() => setShowMenu(false)}>Como funciona</a>
         </nav>
       )}
@@ -245,6 +247,40 @@ export default function Home() {
             <aside className="results-aside"><span className="results-aside-icon"><ShieldCheck size={23} /></span><h3>Dados precisam de contexto.</h3><p>Uma consulta aberta reúne pessoas que decidiram participar. Isso não torna automaticamente seus resultados representativos de todo o eleitorado.</p><div className="aside-rule" /><div className="aside-stat"><strong>0</strong><span>respostas reais coletadas por este protótipo</span></div><button className="button-secondary" onClick={() => setActiveTab("participar")}>Responder missão <ArrowRight size={15} /></button></aside>
           </div>
         )}
+      </section>
+
+      <section className="data-layers-section" id="camadas" aria-labelledby="data-layers-title">
+        <div className="data-layers-heading">
+          <div>
+            <div className="eyebrow"><span className="eyebrow-line" /> ARQUITETURA DE INFORMAÇÃO</div>
+            <h2 id="data-layers-title">Três camadas.<br /><span>Nenhuma mistura.</span></h2>
+            <p>O Pulso Cívico distingue participação comunitária, pesquisas eleitorais publicadas e resultados oficiais. Cada conjunto terá origem, método e atualização próprios.</p>
+          </div>
+          <div className="data-layers-note"><ShieldCheck size={20} /><span><strong>Estado atual</strong><small>Este protótipo não coleta respostas reais nem ingere dados eleitorais.</small></span></div>
+        </div>
+        <div className="data-layers-grid">
+          <article className="data-layer-card community-layer">
+            <span className="data-layer-index">01 / PARTICIPAÇÃO</span>
+            <span className="data-layer-icon"><HeartHandshake size={20} /></span>
+            <h3>Consultas comunitárias</h3>
+            <p>Feedback voluntário sobre funcionalidades, acessibilidade e prioridades do Observatório. Não é intenção de voto nem pesquisa representativa.</p>
+            <span className="data-layer-status">DEMONSTRAÇÃO LOCAL</span>
+          </article>
+          <article className="data-layer-card research-layer">
+            <span className="data-layer-index">02 / PESQUISAS</span>
+            <span className="data-layer-icon"><BarChart3 size={20} /></span>
+            <h3>Pesquisas eleitorais publicadas</h3>
+            <p>Futura área para apresentar fontes verificáveis, instituto, período de campo, metodologia, registro aplicável e limites de cada levantamento.</p>
+            <span className="data-layer-status">PLANEJADA · NÃO CONECTADA</span>
+          </article>
+          <article className="data-layer-card official-layer">
+            <span className="data-layer-index">03 / APURAÇÃO</span>
+            <span className="data-layer-icon"><Radio size={20} /></span>
+            <h3>Resultados oficiais</h3>
+            <p>Futura área separada para dados da Justiça Eleitoral, com proveniência e horário de atualização próprios. Nunca misturados com consultas ou pesquisas.</p>
+            <span className="data-layer-status">PLANEJADA · NÃO CONECTADA</span>
+          </article>
+        </div>
       </section>
 
       <section className="principles-section" id="sobre">
