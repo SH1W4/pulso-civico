@@ -121,7 +121,6 @@ export default function Home() {
         <nav className="desktop-nav" aria-label="Navegação principal">
           <button className={activeTab === "participar" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("participar")}>Participar</button>
           <button className={activeTab === "resultados" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("resultados")}>Explorar dados</button>
-          <a className="nav-link" href="/pesquisas">Pesquisas oficiais</a>
           <a className="nav-link" href="#sobre">Como funciona</a>
         </nav>
         <div className="topbar-actions">
@@ -134,7 +133,6 @@ export default function Home() {
         <nav className="mobile-nav" aria-label="Menu móvel">
           <button onClick={() => { setActiveTab("participar"); setShowMenu(false); }}>Participar</button>
           <button onClick={() => { setActiveTab("resultados"); setShowMenu(false); }}>Explorar dados</button>
-          <a href="/pesquisas" onClick={() => setShowMenu(false)}>Pesquisas oficiais</a>
           <a href="#sobre" onClick={() => setShowMenu(false)}>Como funciona</a>
         </nav>
       )}
