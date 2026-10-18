@@ -1,8 +1,8 @@
 # Pulso Cívico
 
-Módulo de participação cívica gamificada do Observatório Eleitoral.
+Módulo de participação cívica e transparência do Observatório Eleitoral.
 
-> Estado atual: protótipo interativo. As respostas são mantidas apenas no estado da interface; não são enviadas nem persistidas em servidor. Gráficos e percentuais são ilustrativos.
+Estado atual: protótipo interativo com catálogo público de pesquisas presidenciais e consultas comunitárias voluntárias. Metadados do TSE não equivalem a percentuais de intenção de voto; respostas comunitárias não são representativas automaticamente do eleitorado.
 
 ## Executar localmente
 
@@ -38,6 +38,14 @@ npm start
 - Os gráficos são demonstrações estáticas, não resultados de uma pesquisa.
 - Não há service worker nem garantia de funcionamento offline nesta versão.
 
+## Consultas comunitárias persistentes
+
+A API `/api/community/polls` registra respostas voluntárias em PostgreSQL e publica apenas agregados a partir de cinco respostas por consulta. Configure `DATABASE_URL` e `POLL_VOTER_HASH_SECRET` no Vercel e execute `docs/sql/community-polls.sql` antes de habilitar a coleta. O identificador do navegador reduz duplicação, mas não comprova identidade nem impede abuso sofisticado. Revise privacidade, retenção, exclusão e controles de abuso antes de abrir a coleta ao público.
+
+## Pesquisas presidenciais públicas
+
+A interface consulta `/api/research/presidential` para exibir metadados do catálogo público do TSE. O catálogo é uma fonte de registros, não uma fonte automática de percentuais de intenção de voto. Consulte a publicação original de cada instituto para interpretar resultados, metodologia, amostra, período de campo e abrangência.
+
 ## Próximos passos
 
 1. Validar o protótipo visual e a acessibilidade.
@@ -47,7 +55,7 @@ npm start
 5. Adicionar service worker e validar a instalação/offline da PWA.
 6. Configurar CI para lint, typecheck e build.
 
-Consulte `docs/PRODUCT-SCOPE.md`, `docs/ARCHITECTURE.md` e `docs/DATA-GOVERNANCE.md`.
+Consulte `docs/PRODUCT-SCOPE.md`, `docs/ARCHITECTURE.md`, `docs/DATA-GOVERNANCE.md` e `docs/COMMUNITY-POLLING-SETUP.md`.
 
 ## Consultas comunitárias persistentes
 
