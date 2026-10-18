@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -65,15 +65,11 @@ const missions = [
   },
 ];
 
-const demoBars = [
-  { label: "Pesquisas ao longo do tempo", value: 38, color: "mint" },
-  { label: "Comparação de institutos", value: 27, color: "violet" },
-  { label: "Apuração oficial", value: 22, color: "amber" },
-  { label: "Transparência metodológica", value: 13, color: "blue" },
-];
-
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"participar" | "resultados">("participar");
+  const [activeTab, setActiveTab] = useState<"participar" | "resultados">("resultados");
+  const [polls, setPolls] = useState<Array<{ registration: string; institute: string; registeredAt: string | null; fieldStart: string | null; fieldEnd: string | null; sampleSize: number | null; state: string; status: string | null }>>([]);
+  const [pollsLoading, setPollsLoading] = useState(true);
+  const [pollsError, setPollsError] = useState<string | null>(null);
   const [missionIndex, setMissionIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [completed, setCompleted] = useState<number[]>([]);
@@ -86,7 +82,20 @@ export default function Home() {
   const progress = (completed.length / missions.length) * 100;
   const level = points >= 100 ? "Explorador cívico" : points >= 50 ? "Participante" : "Iniciante";
 
-  const demoTotal = useMemo(() => demoBars.reduce((sum, item) => sum + item.value, 0), []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/research/presidential")
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Não foi possível carregar as pesquisas oficiais.");
+        return data;
+      })
+      .then((data) => { if (active) setPolls(data.records ?? []); })
+      .catch((error: unknown) => { if (active) setPollsError(error instanceof Error ? error.message : "Falha ao consultar o TSE."); })
+      .finally(() => { if (active) setPollsLoading(false); });
+    return () => { active = false; };
+  }, []);
 
   function submitAnswer() {
     if (selected === null || isComplete) return;
@@ -124,7 +133,7 @@ export default function Home() {
           <a className="nav-link" href="#sobre">Como funciona</a>
         </nav>
         <div className="topbar-actions">
-          <span className="demo-pill"><span /> MODO DEMONSTRAÇÃO</span>
+          <span className="demo-pill"><span /> DADOS PÚBLICOS · PARTICIPAÇÃO LIVRE</span>
           <button className="icon-button mobile-menu" aria-label="Abrir menu" onClick={() => setShowMenu((value) => !value)}>{showMenu ? <X size={19} /> : <Menu size={19} />}</button>
         </div>
       </header>
@@ -143,8 +152,8 @@ export default function Home() {
           <h1>Sua voz.<br />Mais <span>contexto.</span></h1>
           <p>Um espaço para participar, aprender e entender como os dados cívicos são construídos. Sem torcida. Com transparência.</p>
           <div className="hero-actions">
-            <button className="button-primary" onClick={() => { setActiveTab("participar"); document.getElementById("experience")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Participar agora <ArrowRight size={17} /></button>
-            <button className="button-quiet" onClick={() => setShowInfo((value) => !value)}><Info size={16} /> Sobre esta experiência</button>
+            <button className="button-primary" onClick={() => { setActiveTab("resultados"); document.getElementById("experience")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Ver pesquisas presidenciais <ArrowRight size={17} /></button>
+            <button className="button-quiet" onClick={() => { setActiveTab("participar"); document.getElementById("experience")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><Vote size={16} /> Participar voluntariamente</button>
           </div>
           {showInfo && (
             <div className="inline-note"><Info size={17} /><p>Este protótipo é local e demonstrativo. Suas respostas não são enviadas nem armazenadas em um servidor. Os gráficos usam números ilustrativos.</p></div>
@@ -236,13 +245,12 @@ export default function Home() {
         ) : (
           <div className="results-grid">
             <article className="results-card">
-              <div className="results-title-row"><div><span className="mission-tag">PAINEL ILUSTRATIVO</span><h3>O que a comunidade quer explorar?</h3></div><span className="demo-stamp"><span /> DADOS FICTÍCIOS</span></div>
-              <p className="results-subtitle">Exemplo visual de como uma distribuição de respostas poderá ser apresentada quando houver coleta real.</p>
-              <div className="demo-warning"><Info size={17} /><span>Estes valores são fictícios, não correspondem a votos ou a uma pesquisa real.</span></div>
-              <div className="bar-list">{demoBars.map((bar) => <div className="bar-item" key={bar.label}><div className="bar-label"><span>{bar.label}</span><strong>{bar.value}%</strong></div><div className="bar-track"><span className={bar.color} style={{ width: (bar.value / demoTotal * 100) + "%" }} /></div></div>)}</div>
-              <div className="results-foot"><span><Radio size={15} /> Atualização: demonstração estática</span><span>{demoTotal} pontos ilustrativos</span></div>
+              <div className="results-title-row"><div><span className="mission-tag">FONTE OFICIAL · TSE</span><h3>Pesquisas presidenciais registradas</h3></div><span className="demo-stamp"><span /> DADOS PÚBLICOS</span></div>
+              <p className="results-subtitle">Catálogo de registros encontrados na base pública do TSE. Percentuais de intenção de voto não são inferidos deste catálogo: consulte a publicação ou o relatório de cada instituto.</p>
+              {pollsLoading ? <p className="results-subtitle">Consultando a fonte oficial do TSE…</p> : pollsError ? <div className="demo-warning"><Info size={17} /><span>{pollsError} Consulte também a fonte oficial abaixo.</span></div> : polls.length === 0 ? <p className="results-subtitle">A fonte respondeu, mas ainda não há registros presidenciais que o sistema consiga identificar com segurança.</p> : <div className="bar-list">{polls.slice(0, 8).map((poll, index) => <div className="bar-item" key={`${poll.registration}-${index}`}><div className="bar-label"><span>{poll.institute} · {poll.registration}</span><strong>{poll.sampleSize ? `${poll.sampleSize.toLocaleString("pt-BR")} entrevistas` : "Amostra não informada"}</strong></div><p className="results-subtitle">{[poll.fieldStart && `Campo: ${poll.fieldStart}`, poll.fieldEnd && `até ${poll.fieldEnd}`, poll.registeredAt && `Registro: ${poll.registeredAt}`, poll.state && `Abrangência: ${poll.state}`].filter(Boolean).join(" · ") || "Detalhes disponíveis na fonte oficial."}</p></div>)}</div>}
+              <div className="results-foot"><span><Radio size={15} /> {polls.length} registro(s) identificados</span><a href="/pesquisas">Abrir catálogo completo ↗</a></div>
             </article>
-            <aside className="results-aside"><span className="results-aside-icon"><ShieldCheck size={23} /></span><h3>Dados precisam de contexto.</h3><p>Uma consulta aberta reúne pessoas que decidiram participar. Isso não torna automaticamente seus resultados representativos de todo o eleitorado.</p><div className="aside-rule" /><div className="aside-stat"><strong>0</strong><span>respostas reais coletadas por este protótipo</span></div><button className="button-secondary" onClick={() => setActiveTab("participar")}>Responder missão <ArrowRight size={15} /></button></aside>
+            <aside className="results-aside"><span className="results-aside-icon"><ShieldCheck size={23} /></span><h3>Dados precisam de contexto.</h3><p>Uma consulta aberta reúne pessoas que decidiram participar. Isso não torna automaticamente seus resultados representativos de todo o eleitorado.</p><div className="aside-rule" /><div className="aside-stat"><strong>Aberta</strong><span>Consulta comunitária voluntária; a coleta persistente ainda será ativada.</span></div><button className="button-secondary" onClick={() => setActiveTab("participar")}>Participar voluntariamente <ArrowRight size={15} /></button></aside>
           </div>
         )}
       </section>
@@ -261,7 +269,7 @@ export default function Home() {
         <p>Uma iniciativa de participação cívica com transparência.</p>
         <div className="footer-right"><span><span className="footer-dot" /> PROTÓTIPO INTERATIVO</span><span>© 2026 PULSO CÍVICO</span></div>
       </footer>
-      <div className="disclaimer"><Info size={14} /><span>Protótipo demonstrativo. Não é pesquisa eleitoral registrada, não coleta respostas reais e não representa a opinião do eleitorado brasileiro.</span></div>
+      <div className="disclaimer"><Info size={14} /><span>O catálogo consulta metadados públicos do TSE. A consulta comunitária é voluntária e não representa automaticamente a opinião do eleitorado brasileiro; a coleta de respostas ainda não está ativada.</span></div>
     </main>
   );
 }
