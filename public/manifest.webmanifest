@@ -1,0 +1,14 @@
+{
+  "id": "/",
+  "name": "Pulso Cívico",
+  "short_name": "Pulso",
+  "description": "Participação cívica e aprendizado eleitoral com transparência.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#10110f",
+  "theme_color": "#10110f",
+  "orientation": "portrait-primary",
+  "categories": ["education", "news"]
+}
