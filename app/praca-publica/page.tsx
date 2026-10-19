@@ -151,6 +151,45 @@ export default function PracaPublicaPage() {
           </article>
         </section>
 
+
+        <section id="pc-pesquisas" style={{margin:"8px 0 24px"}}>
+          <article className="pc-panel">
+            <div className="pc-panel-head">
+              <h2><BarChart3 size={15} style={{display:"inline",verticalAlign:"middle",marginRight:7}}/>PESQUISAS ELEITORAIS · 2º TURNO</h2>
+              <span style={{fontSize:10,color:colors.lime}}>FONTES PUBLICADAS</span>
+            </div>
+            <div className="pc-panel-body">
+              <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",flexWrap:"wrap",marginBottom:15}}>
+                <div><div style={{fontSize:24,fontWeight:800,letterSpacing:"-.04em"}}>Disputa apertada</div><p style={{fontSize:11,color:colors.muted,lineHeight:1.65,maxWidth:680,margin:"7px 0 0"}}>Comparação de votos válidos publicados por cinco levantamentos. Cada linha é uma pesquisa independente, com período e método próprios; não é uma contagem de votos nem uma previsão oficial.</p></div>
+                <a href="https://noticias.uol.com.br/eleicoes/agregador-de-pesquisas-eleitorais/" target="_blank" rel="noreferrer" style={{fontSize:11,color:colors.lime,textDecoration:"underline"}}>Abrir agregador do UOL ↗</a>
+              </div>
+              <div style={{display:"grid",gap:14}}>
+                {[
+                  {name:"Vox Brasil",field:"15–17 out.",lula:51,flavio:49,detail:"Divulgada em 18/out. · votos válidos",url:"https://www.poder360.com.br/poder-eleicoes/lula-tem-51-contra-49-de-flavio-em-votos-validos-diz-vox/"},
+                  {name:"Veritá",field:"12–16 out.",lula:48.9,flavio:51.1,detail:"n=15.554 · margem ±1 p.p. · 95% confiança",url:"https://www.cnnbrasil.com.br/eleicoes/verita-flavio-tem-511-dos-votos-validos-no-2o-turno-lula-489/"},
+                  {name:"PoderData / AYA",field:"13–15 out.",lula:50,flavio:50,detail:"n=3.000 · margem ±1,8 p.p. · 95% confiança",url:"https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/poderdata-presidente-outubro-2026-segundo-turno-4/"},
+                  {name:"CNT / MDA",field:"13–15 out.",lula:49.5,flavio:50.5,detail:"Votos válidos · ver detalhes metodológicos na fonte",url:"https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/cnt-mda-presidente-outubro-2026-segundo-turno/"},
+                  {name:"Futura / 100% Cidades",field:"14–15 out.",lula:49.2,flavio:50.8,detail:"n=2.000 · margem ±2,2 p.p. · 95% confiança",url:"https://www.cnnbrasil.com.br/eleicoes/futura-flavio-tem-508-dos-votos-validos-no-2o-turno-lula-492/"}
+                ].map((poll)=>(
+                  <div key={poll.name} style={{padding:"13px 0",borderBottom:"1px solid #1b3445"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
+                      <div><strong style={{fontSize:12}}>{poll.name}</strong><div style={{fontSize:10,color:colors.muted,marginTop:4}}>Coleta: {poll.field} · {poll.detail}</div></div>
+                      <a href={poll.url} target="_blank" rel="noreferrer" style={{fontSize:10,color:colors.lime,whiteSpace:"nowrap"}}>Ver fonte ↗</a>
+                    </div>
+                    <div style={{display:"flex",justifyContent:"space-between",fontSize:11,margin:"12px 0 6px"}}><span style={{color:colors.red}}>Lula <strong>{poll.lula.toLocaleString("pt-BR",{maximumFractionDigits:1})}%</strong></span><span style={{color:colors.blue}}>Flávio <strong>{poll.flavio.toLocaleString("pt-BR",{maximumFractionDigits:1})}%</strong></span></div>
+                    <div aria-label={poll.name+": Lula "+poll.lula+"%, Flávio Bolsonaro "+poll.flavio+"%"} style={{display:"flex",height:10,overflow:"hidden",borderRadius:20,background:"#203746"}}><div style={{width:poll.lula+"%",background:colors.red,transition:"width .3s"}}/><div style={{width:poll.flavio+"%",background:colors.blue,transition:"width .3s"}}/></div>
+                  </div>
+                ))}
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:10,marginTop:16}}>
+                <div style={{padding:12,border:"1px solid #284356",borderRadius:10,background:"#071722"}}><div style={{fontSize:10,color:colors.muted}}>LEITURA RESPONSÁVEL</div><p style={{fontSize:11,lineHeight:1.6,margin:"7px 0 0"}}>Diferenças pequenas devem ser lidas considerando a margem de erro e as metodologias de cada instituto.</p></div>
+                <div style={{padding:12,border:"1px solid #284356",borderRadius:10,background:"#071722"}}><div style={{fontSize:10,color:colors.muted}}>ATUALIZAÇÃO</div><p style={{fontSize:11,lineHeight:1.6,margin:"7px 0 0"}}>Dados publicados em 16–18/out. Este protótipo não consulta fontes automaticamente; a atualização exige revisão e nova publicação dos dados.</p></div>
+              </div>
+              <p style={{fontSize:10,color:colors.muted,lineHeight:1.6,margin:"14px 0 0"}}>Fonte de contexto e metodologia: <a href="https://noticias.uol.com.br/eleicoes/agregador-de-pesquisas-eleitorais/" target="_blank" rel="noreferrer" style={{color:colors.lime}}>Agregador de pesquisas eleitorais do UOL</a>. Os levantamentos não devem ser combinados como se fossem uma única amostra.</p>
+            </div>
+          </article>
+        </section>
+
         <section className="pc-bottom">
           <article className="pc-panel">
             <div className="pc-panel-head"><h2><MessageCircle size={15} style={{display:"inline",verticalAlign:"middle",marginRight:7}}/>PRAÇA DE IDEIAS</h2><span style={{fontSize:10,color:colors.muted}}>LOCAL</span></div>
