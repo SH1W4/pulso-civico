@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -122,6 +124,7 @@ export default function Home() {
           <button className={activeTab === "participar" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("participar")}>Participar</button>
           <button className={activeTab === "resultados" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("resultados")}>Explorar dados</button>
           <a className="nav-link" href="#camadas">Camadas de dados</a>
+          <Link className="nav-link" href="/radar-fluxos">Radar de fluxos</Link>
           <a className="nav-link" href="#sobre">Como funciona</a>
         </nav>
         <div className="topbar-actions">
