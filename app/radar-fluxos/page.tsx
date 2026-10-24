@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Activity, ArrowDownRight, ArrowUpRight, ExternalLink, Eye, FileSearch, GitBranch, Info, ShieldCheck, Wallet, Waves } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowUpRight, Eye, FileSearch, GitBranch, Info, ShieldCheck, Wallet, Waves } from "lucide-react";
 
 const sources = [
   { name: "Polywhaler", type: "Rastreador de grandes operações", updated: "Captura consultada em 24/10/2026", url: "https://polywhaler.com/events/brazil-presidential-election", note: "Agrega operações classificadas como whale trades e aplica seus próprios critérios de alerta." },
