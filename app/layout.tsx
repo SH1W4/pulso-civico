@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pulso Cívico — Sua voz, com contexto",
+  title: "Pulso Cívico — Fontes abertas, leitura crítica",
   description:
-    "Uma experiência demonstrativa de participação cívica, aprendizado e transparência eleitoral.",
+    "Um hub de acesso a fontes públicas, ferramentas de verificação e leitura crítica da informação cívica. Consulte as fontes originais e os limites de cada recurso.",
   applicationName: "Pulso Cívico",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
