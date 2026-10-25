@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Activity, ArrowUpRight, BookOpen, CheckCircle2, CircleHelp, FileSearch, Filter, GitBranch, Info, Search, ShieldCheck } from "lucide-react";
+import { Activity, ArrowUpRight, BookOpen, CircleHelp, Filter, GitBranch, Info, Search, ShieldCheck } from "lucide-react";
 
 type View = "overview" | "evidence" | "hypotheses" | "sources";
 type Status = "Verificado" | "Corroborado" | "Indício" | "Inconclusivo";
