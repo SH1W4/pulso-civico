@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Activity, ArrowUpRight, BookOpen, CircleHelp, Filter, GitBranch, Info, Search, ShieldCheck, Share2, Plus, ExternalLink } from "lucide-react";
+import { Activity, ArrowUpRight, BookOpen, CircleHelp, Filter, GitBranch, Info, Search, ShieldCheck, Share2, Plus, ExternalLink, Network } from "lucide-react";
 
 type View = "overview" | "graph" | "evidence" | "hypotheses" | "sources";
 type Status = "Verificado" | "Corroborado" | "Indício" | "Inconclusivo";
 
 const sections: { id: View; label: string; icon: typeof Activity }[] = [
   { id: "overview", label: "Resumo executivo", icon: Activity },
+  { id: "graph", label: "Mapa de relações", icon: Network },
   { id: "evidence", label: "Evidências e método", icon: ShieldCheck },
   { id: "hypotheses", label: "Hipóteses", icon: GitBranch },
   { id: "sources", label: "Fontes", icon: BookOpen },
@@ -29,6 +30,25 @@ const hypotheses = [
   { id: "H4", title: "Mercado versus pesquisas", question: "Quanto da divergência pode ser explicado por liquidez, contrato, notícias ou diferenças de métrica?", method: "Séries alinhadas, spreads, liquidez e incerteza de cada medição.", evidence: "Dados comparáveis e normalizados; data de campo separada da publicação." },
 ];
 
+type GraphNode = { id: string; label: string; kind: "hypothesis" | "source" | "method"; x: number; y: number; detail: string; url?: string };
+const graphNodes: GraphNode[] = [
+  { id: "h1", label: "Concentração", kind: "hypothesis", x: 400, y: 100, detail: hypotheses[0].question },
+  { id: "h2", label: "Atividade pré-evento", kind: "hypothesis", x: 405, y: 260, detail: hypotheses[1].question },
+  { id: "h3", label: "Relações entre carteiras", kind: "hypothesis", x: 600, y: 180, detail: hypotheses[2].question },
+  { id: "h4", label: "Mercado × pesquisas", kind: "hypothesis", x: 210, y: 265, detail: hypotheses[3].question },
+  { id: "polymarket", label: "Polymarket API", kind: "source", x: 180, y: 95, detail: sources[0].detail, url: sources[0].url },
+  { id: "tse", label: "TSE · pesquisas", kind: "source", x: 115, y: 390, detail: sources[1].detail, url: sources[1].url },
+  { id: "cohven", label: "Cohven", kind: "source", x: 635, y: 390, detail: sources[2].detail, url: sources[2].url },
+  { id: "polywhaler", label: "Polywhaler", kind: "source", x: 650, y: 80, detail: sources[3].detail, url: sources[3].url },
+  { id: "veycast", label: "Veycast", kind: "source", x: 400, y: 420, detail: sources[4].detail, url: sources[4].url },
+  { id: "method", label: "Método e limites", kind: "method", x: 400, y: 180, detail: "Definir janela temporal, critérios de inclusão, explicações alternativas e forma de reprodução antes de interpretar qualquer padrão." },
+];
+const graphEdges = [
+  ["polymarket","h1"],["cohven","h1"],["polywhaler","h3"],["cohven","h3"],
+  ["polymarket","h2"],["veycast","h2"],["tse","h4"],["veycast","h4"],
+  ["method","h1"],["method","h2"],["method","h3"],["method","h4"],
+] as const;
+
 const statuses: { name: Status; description: string }[] = [
   { name: "Verificado", description: "Registro reproduzível em fonte primária." },
   { name: "Corroborado", description: "Evidência independente consistente, método documentado." },
@@ -45,6 +65,7 @@ function StatusTag({ children }: { children: React.ReactNode }) {
 export default function ObservatoryPage() {
   const [view, setView] = useState<View>("overview");
   const [selected, setSelected] = useState("H1");
+  const [selectedGraphNode, setSelectedGraphNode] = useState("h1");
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("Todos");
   const [sourceUrl, setSourceUrl] = useState("");
@@ -74,10 +95,26 @@ export default function ObservatoryPage() {
         .obs-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border-bottom:1px solid var(--line)}.obs-panel-head h2{font-size:12px;margin:0}.obs-panel-body{padding:16px}.obs-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:12px;margin-top:12px}.obs-list{display:grid}.obs-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:14px 0;border-bottom:1px solid #253128}.obs-row:last-child{border-bottom:0}.obs-row strong{font-size:11px}.obs-row p{font-size:10px;line-height:1.7;color:var(--muted);margin:5px 0 0}.status-tag{display:inline-flex;align-items:center;align-self:start;white-space:nowrap;border:1px solid var(--line);border-radius:99px;padding:5px 8px;font-size:9px;color:#c0cbc2}.status-tag.pending{color:#e5c98d;border-color:#61502e}.status-tag.verified{color:#c7f36b;border-color:#52683b}.status-tag.corroborated{color:#8ac7ff;border-color:#38556a}.status-tag.signal{color:#e5b86c;border-color:#65502d}
         .obs-number{font-size:28px;font-weight:800;letter-spacing:-.05em}.obs-muted{font-size:10px;line-height:1.7;color:var(--muted)}.obs-button{display:inline-flex;align-items:center;gap:7px;border:1px solid #3c4b3c;background:#182219;color:var(--lime);border-radius:8px;padding:9px 11px;font-size:10px;cursor:pointer}.obs-button:hover{background:#223022}.obs-hyp-list{display:grid;gap:8px}.obs-hyp{width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;color:var(--text);cursor:pointer}.obs-hyp.active{border-color:#829c5c;background:#172116}.obs-hyp strong{font-size:11px}.obs-hyp p{font-size:10px;line-height:1.7;color:var(--muted);margin:7px 0}.obs-hyp small{color:var(--lime);font-size:9px}
         .obs-search{display:flex;align-items:center;gap:8px;border:1px solid #3a493d;border-radius:8px;padding:0 10px;margin-bottom:12px}.obs-search input{min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);padding:11px 0;font:inherit;font-size:10px}.obs-filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.obs-filter{border:1px solid var(--line);background:#0c120e;color:var(--muted);border-radius:7px;padding:7px 9px;font-size:9px;cursor:pointer}.obs-filter.active{border-color:#6b8249;color:var(--lime)}.obs-source{padding:13px 0;border-bottom:1px solid #253128}.obs-source:last-child{border-bottom:0}.obs-source strong{font-size:11px}.obs-source p{font-size:10px;line-height:1.7;color:var(--muted);margin:6px 0}.obs-source-meta{font-size:9px;color:#89988c;margin-top:4px}
+        
+        .graph-workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:stretch}
+        .graph-canvas{position:relative;min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:13px;background:radial-gradient(circle at 50% 45%,#26342355,transparent 55%),#0b100d}
+        .graph-canvas svg{display:block;width:100%;height:auto;min-height:400px}
+        .graph-edge{stroke:#59694f;stroke-opacity:.65;stroke-width:1.4}
+        .graph-node{cursor:pointer;outline:none}.graph-node circle{stroke-width:1.5;transition:stroke .18s,fill .18s}
+        .graph-node:focus-visible circle,.graph-node.selected circle{stroke:#c2f477;stroke-width:3}
+        .graph-node text{font:11px "DM Sans",sans-serif;fill:#edf2eb;pointer-events:none}
+        .graph-node .node-sub{font:8px "DM Mono",monospace;fill:#a0aa9e;letter-spacing:.06em}
+        .graph-legend{display:flex;gap:12px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid var(--line);color:var(--muted);font-size:9px}
+        .graph-legend span{display:inline-flex;align-items:center;gap:6px}.graph-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+        .graph-inspector{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:16px;min-width:0}
+        .graph-inspector h3{font-size:16px;letter-spacing:-.03em;margin:12px 0 8px}.graph-inspector p{font-size:11px;line-height:1.8;color:var(--muted)}
+        .graph-inspector .graph-meta{font:9px "DM Mono",monospace;letter-spacing:.1em;color:var(--lime);text-transform:uppercase}
+        .graph-links{display:grid;gap:8px;margin-top:14px}.graph-links button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;border:1px solid var(--line);border-radius:8px;background:#101610;color:var(--text);padding:9px;font-size:10px;cursor:pointer}.graph-links button:hover{border-color:#61784b}
+        .graph-disclaimer{margin-top:12px;color:#e4d5b1;background:#211c11;border:1px solid #51452b;border-radius:9px;padding:11px;font-size:10px;line-height:1.7}
         .obs-footer{border-top:1px solid var(--line);margin-top:28px;padding-top:14px;color:#89968b;font-size:9px;line-height:1.7;display:flex;justify-content:space-between;gap:12px}.obs-empty{font-size:10px;color:var(--muted);padding:18px 0}
         .obs-community{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.8fr);gap:12px;margin-top:18px}.obs-field{display:grid;gap:6px;margin-top:12px}.obs-field label{font-size:10px;color:var(--muted)}.obs-field input,.obs-field select,.obs-field textarea{width:100%;border:1px solid #3a493d;border-radius:8px;background:#0c120e;color:var(--text);padding:10px;font:inherit;font-size:11px;min-width:0}.obs-share-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.obs-success{margin-top:10px;padding:10px;border:1px solid #52683b;border-radius:8px;color:#c7f36b;font-size:10px;line-height:1.7}.obs-community-note{font-size:10px;line-height:1.7;color:var(--muted);margin:8px 0 0}
-        @media(max-width:850px){.obs{padding-left:21px;padding-right:21px}.obs-community{grid-template-columns:1fr}.obs-layout{grid-template-columns:1fr;gap:0}.obs-side{border-right:0;border-bottom:1px solid var(--line);padding:12px 0}.obs-side-note{display:none}.obs-nav{display:flex;overflow-x:auto;margin:0}.obs-nav button{width:auto;white-space:nowrap}.obs-main{padding-top:22px}.obs-grid{grid-template-columns:1fr}}
-        @media(max-width:560px){.product-nav{order:3;width:100%;gap:16px}.product-nav a{font-size:11px}.obs{padding:0 16px 26px}.obs-header{min-height:72px;gap:10px}.obs-chip{font-size:8px}.obs-kpis{grid-template-columns:1fr}.obs-kpi{padding:13px}.obs-kpi-value{margin:7px 0 4px}.obs-row{grid-template-columns:1fr;gap:8px}.obs-footer{display:block}.obs-footer span{display:block;margin-top:6px}}
+        @media(max-width:850px){.graph-workspace{grid-template-columns:1fr}.graph-canvas svg{min-height:300px}.obs{padding-left:21px;padding-right:21px}.obs-community{grid-template-columns:1fr}.obs-layout{grid-template-columns:1fr;gap:0}.obs-side{border-right:0;border-bottom:1px solid var(--line);padding:12px 0}.obs-side-note{display:none}.obs-nav{display:flex;overflow-x:auto;margin:0}.obs-nav button{width:auto;white-space:nowrap}.obs-main{padding-top:22px}.obs-grid{grid-template-columns:1fr}}
+        @media(max-width:560px){.graph-canvas svg{min-height:0}.graph-node text{font-size:12px}.product-nav{order:3;width:100%;gap:16px}.product-nav a{font-size:11px}.obs{padding:0 16px 26px}.obs-header{min-height:72px;gap:10px}.obs-chip{font-size:8px}.obs-kpis{grid-template-columns:1fr}.obs-kpi{padding:13px}.obs-kpi-value{margin:7px 0 4px}.obs-row{grid-template-columns:1fr;gap:8px}.obs-footer{display:block}.obs-footer span{display:block;margin-top:6px}}
       `}</style>
       <div className="obs-wrap">
         <header className="obs-header">
@@ -100,6 +137,22 @@ export default function ObservatoryPage() {
             </div>
             <div className="obs-alert"><Info size={15}/><span><strong>Limite atual:</strong> esta é uma interface de protótipo. Nenhuma ingestão automática ou série histórica está conectada. Portanto, não apresentamos números de atividade, alertas ou conclusões como se tivessem sido medidos.</span></div>
 
+            {view==="graph" && <>
+              <h2 className="obs-section-title">Mapa de relações</h2>
+              <p className="obs-intro">Explore como perguntas de investigação se relacionam com fontes candidatas e critérios de método. Selecione um nó para inspecionar sua origem e contexto.</p>
+              <div className="graph-workspace">
+                <div className="graph-canvas">
+                  <svg viewBox="0 0 800 500" role="img" aria-label="Grafo exploratório de hipóteses, fontes e método">
+                    <defs><pattern id="graph-grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#56614f" opacity=".28"/></pattern></defs>
+                    <rect width="800" height="500" fill="url(#graph-grid)"/>
+                    {graphEdges.map(([from,to])=>{const a=graphNodes.find(n=>n.id===from)!;const b=graphNodes.find(n=>n.id===to)!;return <line key={from+"-"+to} className="graph-edge" x1={a.x} y1={a.y} x2={b.x} y2={b.y}/>;})}
+                    {graphNodes.map(node=>{const isSelected=selectedGraphNode===node.id;const fill=node.kind==="hypothesis"?"#25371f":node.kind==="source"?"#18272a":"#30291b";const stroke=node.kind==="hypothesis"?"#9acb63":node.kind==="source"?"#6aabb0":"#c7a968";return <g key={node.id} className={"graph-node"+(isSelected?" selected":"")} role="button" tabIndex={0} aria-label={"Selecionar "+node.label} aria-pressed={isSelected} onClick={()=>setSelectedGraphNode(node.id)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedGraphNode(node.id);}}}><circle cx={node.x} cy={node.y} r={isSelected?11:8} fill={fill} stroke={stroke}/><text x={node.x+14} y={node.y-3}>{node.label}</text><text className="node-sub" x={node.x+14} y={node.y+10}>{node.kind==="hypothesis"?"HIPÓTESE":node.kind==="source"?"FONTE CANDIDATA":"PROTOCOLO"}</text></g>;})}
+                  </svg>
+                  <div className="graph-legend"><span><i style={{background:"#9acb63"}}/>Hipótese</span><span><i style={{background:"#6aabb0"}}/>Fonte candidata</span><span><i style={{background:"#c7a968"}}/>Método</span><span>Linhas = relações propostas, não causalidade comprovada</span></div>
+                </div>
+                {(() => {const node=graphNodes.find(n=>n.id===selectedGraphNode)??graphNodes[0];const related=graphEdges.filter(edge=>edge[0]===node.id||edge[1]===node.id).map(edge=>graphNodes.find(n=>n.id===(edge[0]===node.id?edge[1]:edge[0]))!).filter(Boolean);return <aside className="graph-inspector"><div className="graph-meta">{node.kind==="hypothesis"?"Hipótese":node.kind==="source"?"Fonte candidata":"Critério de método"}</div><h3>{node.label}</h3><p>{node.detail}</p>{node.url&&<a className="obs-button" href={node.url} target="_blank" rel="noreferrer">Abrir fonte original <ExternalLink size={12}/></a>}<div className="obs-overline" style={{marginTop:18}}>Relações no mapa · {related.length}</div><div className="graph-links">{related.map(item=><button key={item.id} onClick={()=>setSelectedGraphNode(item.id)}><span>{item.label}</span><ArrowUpRight size={12}/></button>)}</div><div className="graph-disclaimer">Mapa conceitual do protótipo. As conexões representam relações de investigação propostas; não indicam que uma fonte confirme uma hipótese.</div></aside>;})()}
+              </div>
+            </>}
             {view==="overview" && <>
               <div className="obs-kpis">
                 <article className="obs-kpi"><div className="obs-kpi-label">CONCLUSÕES CONFIRMADAS</div><div className="obs-kpi-value">—</div><div className="obs-kpi-note">Ainda não calculadas: falta uma base de evidências validada.</div></article>
