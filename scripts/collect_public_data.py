@@ -51,8 +51,7 @@ def write_json(path: Path, value: object) -> None:
 
 
 def safe_extract_zip(archive: Path, destination: Path) -> list[Path]:
-    """Extract ZIP members only if names and declared sizes are within limits."""
-    destination.mkdir(parents=True, exist_ok=True)
+    """Validate every ZIP member before writing any extracted file."""
     root = destination.resolve()
     extracted: list[Path] = []
     with zipfile.ZipFile(archive) as zf:
@@ -65,13 +64,21 @@ def safe_extract_zip(archive: Path, destination: Path) -> list[Path]:
         total = sum(item.file_size for item in infos)
         if total > MAX_UNCOMPRESSED_BYTES:
             raise ValueError(f"ZIP exceeds uncompressed-size limit: {total}")
+
+        # Preflight all paths before creating directories or files. A malicious
+        # late member must not leave earlier members partially extracted.
+        validated: list[tuple[zipfile.ZipInfo, Path]] = []
         for info in infos:
             member = PurePosixPath(info.filename)
-            if member.is_absolute() or ".." in member.parts:
+            if member.is_absolute() or ".." in member.parts or "\\\\" in info.filename:
                 raise ValueError(f"Unsafe ZIP member path: {info.filename}")
             target = (destination / Path(*member.parts)).resolve()
             if target != root and root not in target.parents:
                 raise ValueError(f"ZIP member escapes destination: {info.filename}")
+            validated.append((info, target))
+
+        destination.mkdir(parents=True, exist_ok=True)
+        for info, target in validated:
             if info.is_dir():
                 target.mkdir(parents=True, exist_ok=True)
                 continue
