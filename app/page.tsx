@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import ElectionDashboard from "./components/election-dashboard";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -160,15 +161,8 @@ export default function Home() {
         <div><span className="manifesto-index">03 / AUTONOMIA</span><strong>Leitura independente</strong></div>
       </section>
 
-      <section className="launch-election" id="eleicoes" aria-labelledby="election-title">
-        <style>{".launch-election{padding:54px 0;border-bottom:1px solid var(--line,#263126)}.launch-election-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:20px}.launch-election-heading h2{font-size:clamp(32px,4vw,52px);line-height:1;letter-spacing:-.06em;margin:12px 0}.launch-election-heading h2 em{color:var(--lime,#c2f477);font-style:normal}.launch-election-heading p{max-width:440px;color:var(--muted,#a0aa9e);font-size:12px;line-height:1.7}.launch-live-shell{border:1px solid var(--line,#2b352d);border-radius:16px;overflow:hidden;background:var(--panel,#151a16)}.launch-live-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line,#2b352d)}.launch-live-label{display:flex;align-items:center;gap:9px;font:10px ui-monospace,monospace;letter-spacing:.08em;color:var(--lime,#c2f477)}.launch-live-dot{width:7px;height:7px;border-radius:50%;background:#c2f477;box-shadow:0 0 12px #c2f47788}.launch-live-actions{display:flex;gap:8px;flex-wrap:wrap}.launch-live-link{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line,#344034);border-radius:8px;color:var(--text,#f1f4ec);font-size:11px;text-decoration:none}.launch-live-frame{display:block;width:100%;height:min(76vh,760px);min-height:560px;border:0;background:#fff}.launch-live-disclaimer{display:flex;gap:9px;padding:13px 16px;color:var(--muted,#a0aa9e);font-size:10px;line-height:1.7;border-top:1px solid var(--line,#2b352d)}.launch-live-disclaimer svg{flex-shrink:0;color:var(--lime,#c2f477)}@media(max-width:760px){.launch-election-heading{display:block}.launch-election-heading p{margin-top:12px}.launch-live-frame{height:70vh;min-height:520px}.launch-election{padding:40px 0}}"}</style>
-        <div className="launch-election-heading"><div><span className="launch-kicker">ELEIÇÕES 2026 / ACOMPANHAMENTO</span><h2 id="election-title">A apuração, <em>na tela.</em></h2></div><p>Painel externo com dados de apuração. O Pulso Cívico não altera os números exibidos pela fonte; confira a origem e o horário de atualização.</p></div>
-        <div className="launch-live-shell">
-          <div className="launch-live-top"><span className="launch-live-label"><span className="launch-live-dot" /> PAINEL DE APURAÇÃO · FONTE EXTERNA</span><div className="launch-live-actions"><a className="launch-live-link" href="https://resultados.tse.jus.br/" target="_blank" rel="noreferrer">TSE oficial <ExternalLink size={14} /></a><a className="launch-live-link" href="https://agenciabrasil.ebc.com.br/eleicoes/2026/apuracao/segundo-turno" target="_blank" rel="noreferrer">Abrir em nova aba <ArrowUpRight size={14} /></a></div></div>
-          <iframe className="launch-live-frame" title="Painel de apuração eleitoral da Agência Brasil, com dados atribuídos ao TSE" src="https://agenciabrasil.ebc.com.br/eleicoes/2026/apuracao/segundo-turno" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
-          <div className="launch-live-disclaimer"><ShieldCheck size={15} /><span>Os dados são apresentados pela Agência Brasil, que identifica o TSE como fonte. Se o painel não carregar dentro desta página por restrições do site, use “Abrir em nova aba” ou o portal oficial. Este iframe não é uma integração própria nem uma captura auditável do Pulso Cívico.</span></div>
-        </div>
-      </section>
+      <ElectionDashboard />
+
       <section className="launch-explore" id="explorar">
         <div className="launch-section-heading">
           <div><span className="launch-kicker">UM HUB PARA INVESTIGAR</span><h2>Da pergunta<br />à <em>fonte.</em></h2></div>
