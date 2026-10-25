@@ -120,6 +120,25 @@ export default function ObservatoryPage() {
           </div>
           <div className="obs-notice"><Info size={15}/><span><strong>Estado dos dados:</strong> esta interface é uma camada visual de protótipo. Não há ingestão automática, grafo de transações reconstruído nem série histórica sincronizada conectada. Indicadores de fontes externas precisam ser reconciliados antes de qualquer conclusão.</span></div>
 
+          <article className="obs-panel" style={{marginBottom:18,borderColor:"#4a5d39"}}>
+            <div className="obs-panel-head">
+              <h2><Activity size={13} style={{display:"inline",marginRight:7,color:"#c7f36b"}}/>Rotina de atualização Observatory</h2>
+              <span className="obs-pill" style={{color:"#c7f36b",borderColor:"#4a5d39"}}>AGENDAMENTO ATIVO</span>
+            </div>
+            <div className="obs-panel-body">
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(145px,1fr))",gap:12}}>
+                <div><div className="eyebrow">FREQUÊNCIA</div><div style={{fontSize:18,fontWeight:750,marginTop:7}}>A cada 1 hora</div><div className="obs-mini">Fuso: America/Bahia</div></div>
+                <div><div className="eyebrow">FONTES MONITORADAS</div><div style={{fontSize:12,fontWeight:650,marginTop:7}}>Polymarket + TSE</div><div className="obs-mini">Mercados, preços, volume, atividade e pesquisas eleitorais</div></div>
+                <div><div className="eyebrow">ÚLTIMA EXECUÇÃO</div><div style={{fontSize:12,fontWeight:650,marginTop:7}}>Aguardando primeira execução</div><div className="obs-mini">Nenhum relatório periódico confirmado ainda</div></div>
+              </div>
+              <div className="obs-notice" style={{marginTop:14,marginBottom:12}}><Info size={15}/><span><strong>Escopo do agendamento:</strong> a tarefa do ChatGPT gera relatórios nesta conversa. Ela ainda não atualiza o banco de dados nem o frontend hospedado do GitHub. Esta indicação não significa que o site esteja recebendo dados ao vivo.</span></div>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                <a className="obs-filter" href="https://gamma-api.polymarket.com/events?active=true&closed=false&limit=20" target="_blank" rel="noreferrer" style={{textDecoration:"none"}}>Abrir API Polymarket ↗</a>
+                <a className="obs-filter" href="https://dadosabertos.tse.jus.br/dataset/pesquisas-eleitorais-2026" target="_blank" rel="noreferrer" style={{textDecoration:"none"}}>Abrir dados TSE ↗</a>
+              </div>
+            </div>
+          </article>
+
           {view==="overview" && <>
             <div className="obs-kpis">
               <article className="obs-kpi"><div className="obs-kpi-label">ESTADO DA INVESTIGAÇÃO</div><div className="obs-kpi-value lime">Em aberto</div><div className="obs-kpi-foot">Nenhuma hipótese confirmada</div></article>
