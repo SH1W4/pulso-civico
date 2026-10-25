@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  ArrowLeft, ArrowUpRight, Check, Copy, Download, FileCheck2, Fingerprint,
+  ArrowLeft, ArrowUpRight, Download, FileCheck2, Fingerprint,
   GitCompare, Globe2, Link2, Radio, ShieldCheck, Share2, TimerReset
 } from "lucide-react";
 
