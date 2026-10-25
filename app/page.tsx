@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -122,6 +124,7 @@ export default function Home() {
           <button className={activeTab === "participar" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("participar")}>Participar</button>
           <button className={activeTab === "resultados" ? "nav-link active" : "nav-link"} onClick={() => setActiveTab("resultados")}>Explorar dados</button>
           <a className="nav-link" href="#camadas">Camadas de dados</a>
+          <Link className="nav-link" href="/radar-fluxos">Radar de fluxos</Link>\n          <Link className="nav-link" href="/observatory">Observatory</Link>
           <a className="nav-link" href="#sobre">Como funciona</a>
         </nav>
         <div className="topbar-actions">
@@ -134,7 +137,7 @@ export default function Home() {
         <nav id="mobile-navigation" className="mobile-nav" aria-label="Menu móvel">
           <button onClick={() => { setActiveTab("participar"); setShowMenu(false); }}>Participar</button>
           <button onClick={() => { setActiveTab("resultados"); setShowMenu(false); }}>Explorar dados</button>
-          <a href="#camadas" onClick={() => setShowMenu(false)}>Camadas de dados</a>
+          <a href="#camadas" onClick={() => setShowMenu(false)}>Camadas de dados</a>\n          <Link href="/observatory" onClick={() => setShowMenu(false)}>Observatory</Link>
           <a href="#sobre" onClick={() => setShowMenu(false)}>Como funciona</a>
         </nav>
       )}
