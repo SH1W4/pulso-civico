@@ -10,6 +10,14 @@ const HEADERS = {
 };
 
 type JsonRecord = Record<string, unknown>;
+type Candidate = {
+  name: string;
+  party: string;
+  votes: number;
+  percent: number;
+  number: string;
+  status: string;
+};
 
 function asRecord(value: unknown): JsonRecord | null {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -17,18 +25,59 @@ function asRecord(value: unknown): JsonRecord | null {
     : null;
 }
 
-function asArray(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : [];
+function requiredRecord(value: unknown, field: string): JsonRecord {
+  const record = asRecord(value);
+  if (!record) throw new Error("TSE_SCHEMA_INVALID_" + field);
+  return record;
+}
+
+function requiredArray(value: unknown, field: string): unknown[] {
+  if (!Array.isArray(value)) throw new Error("TSE_SCHEMA_INVALID_" + field);
+  return value;
 }
 
 function textValue(value: unknown, fallback = ""): string {
-  return value === null || value === undefined ? fallback : String(value);
+  return value === null || value === undefined ? fallback : String(value).trim();
 }
 
-function numericValue(value: unknown): number {
-  const normalized = textValue(value, "0").replace(",", ".");
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : 0;
+/**
+ * Parse only explicit, finite numeric values. Missing or malformed values must
+ * not silently become zero: zero is a valid value and must remain distinguishable
+ * from missing data.
+ */
+function numericValue(
+  value: unknown,
+  field: string,
+  options: { integer?: boolean; min?: number; max?: number } = {},
+): number {
+  if (
+    value === null ||
+    value === undefined ||
+    (typeof value === "string" && value.trim() === "")
+  ) {
+    throw new Error("TSE_NUMERIC_MISSING_" + field);
+  }
+
+  const normalized =
+    typeof value === "string" ? value.trim().replace(",", ".") : value;
+  const parsed =
+    typeof normalized === "number"
+      ? normalized
+      : typeof normalized === "string"
+        ? Number(normalized)
+        : Number.NaN;
+
+  if (!Number.isFinite(parsed)) throw new Error("TSE_NUMERIC_INVALID_" + field);
+  if (options.integer && !Number.isInteger(parsed)) {
+    throw new Error("TSE_NUMERIC_NOT_INTEGER_" + field);
+  }
+  if (options.min !== undefined && parsed < options.min) {
+    throw new Error("TSE_NUMERIC_OUT_OF_RANGE_" + field);
+  }
+  if (options.max !== undefined && parsed > options.max) {
+    throw new Error("TSE_NUMERIC_OUT_OF_RANGE_" + field);
+  }
+  return parsed;
 }
 
 async function fetchJson(url: string): Promise<unknown> {
@@ -39,6 +88,45 @@ async function fetchJson(url: string): Promise<unknown> {
   });
   if (!response.ok) throw new Error("TSE_HTTP_" + response.status);
   return response.json() as Promise<unknown>;
+}
+
+function parseCandidates(cargo: JsonRecord): Candidate[] {
+  const groups = requiredArray(cargo.agr, "PRESIDENTIAL_GROUPS");
+  const candidates: Candidate[] = [];
+
+  for (const groupRaw of groups) {
+    const group = requiredRecord(groupRaw, "GROUP");
+    const parties = requiredArray(group.par, "PARTIES");
+
+    for (const partyRaw of parties) {
+      const party = requiredRecord(partyRaw, "PARTY");
+      const partyCandidates = requiredArray(party.cand, "CANDIDATES");
+
+      for (const candidateRaw of partyCandidates) {
+        const candidate = requiredRecord(candidateRaw, "CANDIDATE");
+        const name = textValue(candidate.nmu || candidate.nm);
+        if (!name) throw new Error("TSE_CANDIDATE_NAME_MISSING");
+
+        candidates.push({
+          name,
+          party: textValue(party.sg),
+          votes: numericValue(candidate.vap, "CANDIDATE_VOTES", {
+            integer: true,
+            min: 0,
+          }),
+          percent: numericValue(candidate.pvap, "CANDIDATE_PERCENT", {
+            min: 0,
+            max: 100,
+          }),
+          number: textValue(candidate.n),
+          status: textValue(candidate.st),
+        });
+      }
+    }
+  }
+
+  if (!candidates.length) throw new Error("TSE_NO_CANDIDATES");
+  return candidates.sort((a, b) => b.votes - a.votes);
 }
 
 export async function GET() {
@@ -53,45 +141,33 @@ export async function GET() {
     const tracking = asRecord(trackingRaw);
     const result = asRecord(resultRaw);
 
-    if (!result || textValue(result.ele) !== "6258" || !Array.isArray(result.carg)) {
+    if (!result || textValue(result.ele) !== "6258") {
       throw new Error("TSE_SCHEMA_UNEXPECTED");
     }
 
-    const cargo = result.carg
-      .map(asRecord)
+    const cargos = requiredArray(result.carg, "CARGOS");
+    const cargo = cargos
+      .map((item) => asRecord(item))
       .find((item) => item && textValue(item.cd) === "1");
 
-    if (!cargo || !Array.isArray(cargo.agr)) {
-      throw new Error("TSE_PRESIDENTIAL_CARGO_MISSING");
-    }
+    if (!cargo) throw new Error("TSE_PRESIDENTIAL_CARGO_MISSING");
 
-    const candidates = cargo.agr
-      .flatMap((groupRaw) => {
-        const group = asRecord(groupRaw);
-        return asArray(group?.par).flatMap((partyRaw) => {
-          const party = asRecord(partyRaw);
-          return asArray(party?.cand).map((candidateRaw) => {
-            const candidate = asRecord(candidateRaw);
-            return {
-              name: textValue(candidate?.nmu || candidate?.nm, "Candidatura"),
-              party: textValue(party?.sg),
-              votes: numericValue(candidate?.vap),
-              percent: numericValue(candidate?.pvap),
-              number: textValue(candidate?.n),
-              status: textValue(candidate?.st),
-            };
-          });
-        });
-      })
-      .filter(
-        (candidate) =>
-          Number.isFinite(candidate.votes) && Number.isFinite(candidate.percent),
-      )
-      .sort((a, b) => b.votes - a.votes);
+    const candidates = parseCandidates(cargo);
+    const sections = requiredRecord(result.s, "SECTIONS");
+    const totalSections = numericValue(sections.ts, "TOTAL_SECTIONS", {
+      integer: true,
+      min: 0,
+    });
+    const countedSections = numericValue(sections.st, "COUNTED_SECTIONS", {
+      integer: true,
+      min: 0,
+      max: totalSections,
+    });
+    const countedPercent = numericValue(sections.pst, "COUNTED_PERCENT", {
+      min: 0,
+      max: 100,
+    });
 
-    if (!candidates.length) throw new Error("TSE_NO_CANDIDATES");
-
-    const sections = asRecord(result.s) ?? {};
     const generatedAt = [result.dg, result.hg].filter(Boolean).join(" ");
     const trackingGeneratedAt = [tracking?.dg, tracking?.hg]
       .filter(Boolean)
@@ -108,9 +184,9 @@ export async function GET() {
         officialUrl: "https://resultados.tse.jus.br/",
         electionCode: "6258",
         generatedAt,
-        totalSections: numericValue(sections.ts),
-        countedSections: numericValue(sections.st),
-        countedPercent: numericValue(sections.pst),
+        totalSections,
+        countedSections,
+        countedPercent,
         final,
         candidates,
         sourceFiles: urls,
@@ -118,7 +194,8 @@ export async function GET() {
         integrity: {
           schemaValidated: true,
           signatureVerified: false,
-          note: "Estrutura básica validada; assinatura JWS ainda não verificada.",
+          note:
+            "Estrutura e campos numéricos obrigatórios validados; assinatura JWS ainda não verificada.",
         },
       },
       { headers: { "Cache-Control": "no-store, max-age=0" } },
@@ -130,11 +207,11 @@ export async function GET() {
         checkedAt,
         source: "TSE",
         message:
-          "A consulta oficial falhou ou o formato recebido não passou na validação. Nenhum valor anterior será apresentado como atual.",
+          "A consulta oficial falhou ou os dados recebidos não passaram na validação. Nenhum valor anterior será apresentado como atual.",
         detail: error instanceof Error ? error.message : "unknown",
         officialUrl: "https://resultados.tse.jus.br/",
       },
-      { status: 502, headers: { "Cache-Control": "no-store" } },
+      { status: 502, headers: { "Cache-Control": "no-store, max-age=0" } },
     );
   }
 }
