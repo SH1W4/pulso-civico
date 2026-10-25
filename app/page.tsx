@@ -160,6 +160,34 @@ export default function Home() {
         <div><span className="manifesto-index">03 / AUTONOMIA</span><strong>Leitura independente</strong></div>
       </section>
 
+      <section className="launch-election" id="eleicoes" aria-labelledby="election-title">
+        <style>{".launch-election{padding:76px 0;border-bottom:1px solid var(--line,#263126)}.launch-election-heading{display:grid;grid-template-columns:1fr minmax(260px,.7fr);gap:28px;align-items:end;margin-bottom:26px}.launch-election-heading h2{font-size:clamp(32px,4vw,52px);line-height:1;letter-spacing:-.06em;margin:14px 0 0}.launch-election-heading h2 em{color:var(--lime,#c2f477);font-style:normal}.launch-election-heading>p,.launch-election-card p{color:var(--muted,#a0aa9e);font-size:13px;line-height:1.75}.launch-election-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.launch-election-card{min-width:0;display:flex;flex-direction:column;align-items:flex-start;border:1px solid var(--line,#2b352d);border-radius:14px;background:var(--panel,#151a16);padding:22px}.launch-election-primary{border-color:#526b36;background:linear-gradient(145deg,#1c2819,#141914)}.launch-election-card-top{width:100%;display:flex;justify-content:space-between;gap:12px;color:var(--lime,#c2f477);font:10px ui-monospace,monospace;letter-spacing:.08em}.launch-election-card h3{font-size:19px;letter-spacing:-.03em;margin:26px 0 0}.launch-election-card p{flex:1;margin:10px 0 18px}.launch-election-card small{display:block;color:var(--muted,#a0aa9e);font-size:10px;line-height:1.6;margin-top:16px}.launch-election-note{display:flex;align-items:flex-start;gap:10px;padding:15px;margin-top:14px;border:1px solid var(--line,#2b352d);border-radius:10px;color:var(--muted,#a0aa9e);font-size:11px;line-height:1.7}.launch-election-note svg{flex-shrink:0;color:var(--lime,#c2f477);margin-top:2px}.launch-election-note strong{color:var(--text,#f1f4ec)}@media(max-width:800px){.launch-election-heading{grid-template-columns:1fr;gap:10px}.launch-election-grid{grid-template-columns:1fr}.launch-election-card{padding:18px}.launch-election{padding:54px 0}}"}</style>
+        <div className="launch-election-heading">
+          <div><span className="launch-kicker">ELEIÇÕES 2026 / FONTES SEPARADAS</span><h2 id="election-title">Acompanhe a <em>apuração.</em></h2></div>
+          <p>Consulte o dado na origem. Este painel não simula uma transmissão ao vivo: os resultados só serão exibidos aqui quando houver coleta e validação automáticas verificadas.</p>
+        </div>
+        <div className="launch-election-grid">
+          <article className="launch-election-card launch-election-primary">
+            <div className="launch-election-card-top"><span>01 / RESULTADO OFICIAL</span><ShieldCheck size={18} /></div>
+            <h3>Tribunal Superior Eleitoral</h3><p>Acompanhe a totalização oficial e selecione a eleição, o estado e o município no portal do TSE.</p>
+            <a href="https://resultados.tse.jus.br/" target="_blank" rel="noreferrer" className="launch-card-link">Abrir resultados oficiais <ArrowUpRight size={16} /></a>
+            <small>Fonte primária · consulta externa · sem espelhamento de números nesta versão</small>
+          </article>
+          <article className="launch-election-card">
+            <div className="launch-election-card-top"><span>02 / COBERTURA INDEPENDENTE</span><ExternalLink size={17} /></div>
+            <h3>Apuração na Bahia</h3><p>Consulte a página de cobertura do SBT News, que identifica os dados como provenientes do TSE. Confira o horário da última atualização antes de interpretar os números.</p>
+            <a href="https://sbtnews.sbt.com.br/eleicoes/2026/visao-geral/ba" target="_blank" rel="noreferrer" className="launch-card-link">Ver painel da Bahia <ArrowUpRight size={16} /></a>
+            <small>Fonte secundária · a página externa pode atualizar em outro ritmo</small>
+          </article>
+          <article className="launch-election-card">
+            <div className="launch-election-card-top"><span>03 / PESQUISAS</span><BookOpen size={18} /></div>
+            <h3>Intenção de voto não é apuração</h3><p>Pesquisas são entrevistas realizadas segundo a metodologia e o período de cada instituto; resultados oficiais são votos contabilizados pela Justiça Eleitoral. Não misturamos as duas séries.</p>
+            <a href="https://noticias.uol.com.br/eleicoes/agregador-de-pesquisas-eleitorais/" target="_blank" rel="noreferrer" className="launch-card-link">Consultar agregador de pesquisas <ArrowUpRight size={16} /></a>
+            <small>Agregador editorial · metodologia e datas variam por levantamento</small>
+          </article>
+        </div>
+        <div className="launch-election-note"><ShieldCheck size={16} /><span><strong>Integridade do painel:</strong> nenhum percentual é copiado para esta interface sem captura com fonte, horário, método e validação. A camada de participação popular também deve permanecer separada dos resultados oficiais e das pesquisas.</span></div>
+      </section>
       <section className="launch-explore" id="explorar">
         <div className="launch-section-heading">
           <div><span className="launch-kicker">UM HUB PARA INVESTIGAR</span><h2>Da pergunta<br />à <em>fonte.</em></h2></div>
