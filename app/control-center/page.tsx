@@ -96,7 +96,7 @@ export default function ControlCenterPage() {
       <section className={styles.main}>
         <header className={styles.topbar}>
           <div className={styles.breadcrumb}><span>Workspace</span><ChevronRight size={14} /><strong>{sectionLabel}</strong></div>
-          <div className={styles.topActions}><span className={styles.systemState}><i /> PAINEL INTERNO · STATUS REGISTRADO</span><a href="https://github.com/SH1W4/pulso-civico/pulls" target="_blank" rel="noreferrer" aria-label="Abrir pull requests no GitHub" className={styles.topButton}><GitPullRequest size={15} /> Pull requests <ArrowUpRight size={13} /></a></div>
+          <div className={styles.topActions}><nav className={styles.productNav} aria-label="Navegação do produto"><Link href="/observatory">Observatório</Link><Link href="/radar-fluxos">Radar de fluxos</Link><Link href="/">Página pública</Link></nav><span className={styles.systemState}><i /> PAINEL INTERNO · STATUS REGISTRADO</span><a href="https://github.com/SH1W4/pulso-civico/pulls" target="_blank" rel="noreferrer" aria-label="Abrir pull requests no GitHub" className={styles.topButton}><GitPullRequest size={15} /> Pull requests <ArrowUpRight size={13} /></a></div>
         </header>
 
         {section === "overview" && (
