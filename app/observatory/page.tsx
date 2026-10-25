@@ -36,8 +36,9 @@ const statuses: { name: Status; description: string }[] = [
   { name: "Inconclusivo", description: "Dados insuficientes, conflitantes ou não comparáveis." },
 ];
 
-function StatusTag({ children }: { children: Status | "Pendente" | "Protótipo" }) {
-  const cls = children === "Verificado" ? "verified" : children === "Corroborado" ? "corroborated" : children === "Indício" ? "signal" : "pending";
+function StatusTag({ children }: { children: React.ReactNode }) {
+  const label = typeof children === "string" ? children : "";
+  const cls = label === "Verificado" ? "verified" : label === "Corroborado" ? "corroborated" : label === "Indício" ? "signal" : "pending";
   return <span className={"status-tag " + cls}>{children}</span>;
 }
 
