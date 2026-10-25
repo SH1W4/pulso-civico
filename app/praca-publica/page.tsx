@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Activity, ArrowRight, BarChart3, Check, ChevronDown, Compass, Heart, Info, MapPin, Menu, MessageCircle, ShieldCheck, Users, Vote, X } from "lucide-react";
+import { Activity, ArrowRight, BarChart3, Check, Compass, Heart, Info, MapPin, Menu, MessageCircle, ShieldCheck, Users, Vote, X } from "lucide-react";
 
 type March = "lula" | "flavio";
 const issues = [
@@ -79,7 +80,7 @@ export default function PracaPublicaPage() {
       `}</style>
       <div className="pc-wrap">
         <header className="pc-header">
-          <a className="pc-brand" href="/"><span className="pc-logo"><Activity size={24}/></span><span><strong>Pulso Cívico</strong><small>PESSOAS. DADOS. DEMOCRACIA.</small></span></a>
+          <Link className="pc-brand" href="/"><span className="pc-logo"><Activity size={24}/></span><span><strong>Pulso Cívico</strong><small>PESSOAS. DADOS. DEMOCRACIA.</small></span></Link>
           <nav className={"pc-nav" + (showMenu ? " open" : "")} aria-label="Navegação principal">
             <button className={tab === "passeatas" ? "active" : ""} onClick={() => setTab("passeatas")}><Users size={14} style={{display:"inline",verticalAlign:"middle",marginRight:6}}/>Passeatas</button>
             <button className={tab === "pautas" ? "active" : ""} onClick={() => setTab("pautas")}><Vote size={14} style={{display:"inline",verticalAlign:"middle",marginRight:6}}/>Pautas</button>
