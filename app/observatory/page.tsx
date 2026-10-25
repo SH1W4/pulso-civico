@@ -158,7 +158,52 @@ export default function ObservatoryPage() {
             </div>
           </>}
 
-          {view==="flows" && <><h2 className="obs-section-title">Carteiras e fluxos financeiros</h2><p className="obs-section-intro">A investigação deve partir de negociações e transferências públicas verificáveis, sem atribuir identidade civil a um endereço sem evidência independente.</p><div className="obs-grid"><article className="obs-panel"><div className="obs-panel-head"><h2>Grafo de fluxo</h2><span className="obs-pill">MODELO CONCEITUAL</span></div><div className="obs-panel-body"><Graph/><div className="obs-notice" style={{marginTop:12,marginBottom:0}}><Wallet size={15}/><span>Para preencher o grafo: obter trade IDs, endereços, hashes de transação, ativos, montantes e timestamps; validar contra o explorador da rede.</span></div></div></article><article className="obs-panel"><div className="obs-panel-head"><h2>Campos mínimos por transação</h2></div><div className="obs-panel-body">{["Hash e rede","Endereço de origem e destino","Ativo e valor bruto","Timestamp UTC","Relação temporal com negociação","Método e confiança da atribuição"].map((x,i)=><div className="obs-event" key={x}><div className="obs-time">CAMPO 0{i+1}</div><div><strong>{x}</strong><p>Armazenar a origem e preservar o registro bruto para auditoria.</p></div></div)}</div></article></div></>}
+          {view === "flows" && (
+            <>
+              <h2 className="obs-section-title">Carteiras e fluxos financeiros</h2>
+              <p className="obs-section-intro">
+                A investigação deve partir de negociações e transferências públicas verificáveis, sem atribuir identidade civil a um endereço sem evidência independente.
+              </p>
+              <div className="obs-grid">
+                <article className="obs-panel">
+                  <div className="obs-panel-head">
+                    <h2>Grafo de fluxo</h2>
+                    <span className="obs-pill">MODELO CONCEITUAL</span>
+                  </div>
+                  <div className="obs-panel-body">
+                    <Graph />
+                    <div className="obs-notice" style={{ marginTop: 12, marginBottom: 0 }}>
+                      <Wallet size={15} />
+                      <span>Para preencher o grafo: obter trade IDs, endereços, hashes de transação, ativos, montantes e timestamps; validar contra o explorador da rede.</span>
+                    </div>
+                  </div>
+                </article>
+                <article className="obs-panel">
+                  <div className="obs-panel-head">
+                    <h2>Campos mínimos por transação</h2>
+                  </div>
+                  <div className="obs-panel-body">
+                    {[
+                      "Hash e rede",
+                      "Endereço de origem e destino",
+                      "Ativo e valor bruto",
+                      "Timestamp UTC",
+                      "Relação temporal com negociação",
+                      "Método e confiança da atribuição",
+                    ].map((field, index) => (
+                      <div className="obs-event" key={field}>
+                        <div className="obs-time">CAMPO 0{index + 1}</div>
+                        <div>
+                          <strong>{field}</strong>
+                          <p>Armazenar a origem e preservar o registro bruto para auditoria.</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              </div>
+            </>
+          )}
 
           {view==="narrative" && <><h2 className="obs-section-title">Imprensa, pesquisas e eventos</h2><p className="obs-section-intro">Uma linha temporal confiável precisa distinguir data de campo, data de divulgação e momento em que o mercado reagiu.</p><div className="obs-grid"><article className="obs-panel"><div className="obs-panel-head"><h2>Eventos a importar</h2><span className="obs-pill">SEM SÉRIE HISTÓRICA</span></div><div className="obs-panel-body"><div className="obs-timeline">{events.map((e,i)=><div className="obs-event" key={i}><div className="obs-time">{e.time}</div><div><strong>{e.title}</strong><p>{e.note}</p><span className="obs-pill">{e.type}</span></div></div>)}</div></div></article><article className="obs-panel"><div className="obs-panel-head"><h2>Normalização das pesquisas</h2></div><div className="obs-panel-body">{["Instituto e contratante","Campo e publicação","População, amostra e método","Margem de erro e confiança","Resultado bruto e votos válidos","Registro e questionário"].map((x,i)=><div className="obs-event" key={x}><div className="obs-time">VARIÁVEL 0{i+1}</div><div><strong>{x}</strong><p>Preservar a unidade original e não comparar métricas diferentes como se fossem equivalentes.</p></div></div>)}<a className="obs-source-link" href="https://www.tse.jus.br/eleicoes/pesquisas-eleitorais" target="_blank" rel="noreferrer">Abrir portal do TSE ↗</a></div></article></div></>}
 
