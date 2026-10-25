@@ -106,6 +106,11 @@ export default function ControlCenterPage() {
               <div className={styles.introOrb}><div className={styles.orbRing} /><div className={styles.orbCenter}><Activity size={30} /></div><span className={styles.orbPoint} /></div>
             </div>
 
+            <div role="status" style={{display:"flex",gap:12,alignItems:"flex-start",padding:"14px 16px",margin:"0 0 18px",border:"1px solid #65512c",borderRadius:12,background:"#211c11",color:"#e8d8b4",fontSize:12,lineHeight:1.7}}>
+              <ShieldCheck size={17} style={{flexShrink:0,marginTop:2}} />
+              <div><strong>Checklist de transparência — dia da eleição (25/10/2026)</strong><br/>O Radar contém snapshots externos datados de 22–24/10 e não deve ser tratado como feed atualizado hoje. Antes de compartilhar números, confirme horário, contrato e fonte original. Resultados oficiais devem ser consultados diretamente no TSE; o protótipo não é uma apuração oficial.</div>
+            </div>
+
             <div className={styles.metrics}>
               <article className={styles.metric}><div className={styles.metricTop}><span>MARCO ATUAL</span><Layers3 size={16} /></div><strong>02<span>/05</span></strong><small>Etapas concluídas</small><div className={styles.metricTrack}><i style={{ width: "40%" }} /></div></article>
               <article className={styles.metric}><div className={styles.metricTop}><span>PULL REQUESTS</span><GitPullRequest size={16} /></div><strong>02<span> merged</span></strong><small>Fundação e PWA integradas</small><div className={styles.metricMeta}><Check size={13} /> fluxo por PR ativo</div></article>
