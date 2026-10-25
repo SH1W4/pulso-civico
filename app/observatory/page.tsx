@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Activity, ArrowUpRight, BookOpen, CircleHelp, Filter, GitBranch, Info, Search, ShieldCheck, Share2, Plus, ExternalLink } from "lucide-react";
 
-type View = "overview" | "evidence" | "hypotheses" | "sources";
+type View = "overview" | "graph" | "evidence" | "hypotheses" | "sources";
 type Status = "Verificado" | "Corroborado" | "Indício" | "Inconclusivo";
 
 const sections: { id: View; label: string; icon: typeof Activity }[] = [
