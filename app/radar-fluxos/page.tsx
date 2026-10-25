@@ -42,7 +42,7 @@ export default function RadarFluxosPage() {
       `}</style>
       <div className="radar-wrap">
         <header className="radar-top">
-          <Link href="/" className="radar-brand"><span className="radar-mark"><Activity size={20}/></span><span>PULSO CÍVICO <span style={{color:"#d8ff48"}}>/</span> RADAR</span></Link>
+          <Link href="/" className="radar-brand"><span className="radar-mark"><Activity size={20}/></span><span>PULSO CÍVICO <span style={{color:"#c2f477"}}>/</span> RADAR</span></Link>
           <nav className="product-nav" aria-label="Navegação do produto"><Link href="/observatory">Observatório</Link><Link href="/radar-fluxos" aria-current="page">Radar de fluxos</Link><Link href="/control-center">Centro de controle ↗</Link></nav><Link href="/" className="radar-back">← Início</Link>
         </header>
 
@@ -114,7 +114,7 @@ export default function RadarFluxosPage() {
             <input className="radar-search" aria-label="Filtrar fontes" placeholder="Filtrar por nome, tipo ou observação…" value={query} onChange={(event)=>setQuery(event.target.value)}/>
             <div className="radar-source-list">{filteredSources.map((source)=><div className="radar-source" key={source.name}><div className="radar-source-top"><div><strong>{source.name}</strong><div className="radar-small">{source.type}</div></div><a className="radar-source-link" href={source.url} target="_blank" rel="noreferrer">Abrir fonte ↗</a></div><span className="radar-tag">{source.updated}</span><p>{source.note}</p></div>)}</div>
           </div></article>
-          <article className="radar-panel"><div className="radar-panel-head"><h2>Como ler os números</h2><ShieldCheck size={17} color="#d8ff48"/></div><div className="radar-panel-body radar-list">
+          <article className="radar-panel"><div className="radar-panel-head"><h2>Como ler os números</h2><ShieldCheck size={17} color="#c2f477"/></div><div className="radar-panel-body radar-list">
             <div className="radar-list-item"><span className="radar-num"><Eye size={14}/></span><div><strong>Probabilidade não é intenção de voto</strong><p>O mercado precifica um contrato sobre um evento; pesquisa entrevista uma amostra de pessoas.</p></div></div>
             <div className="radar-list-item"><span className="radar-num"><Wallet size={14}/></span><div><strong>Volume não é capital novo</strong><p>Volume acumulado pode contar muitas trocas do mesmo capital. Notional, liquidez e open interest medem coisas diferentes.</p></div></div>
             <div className="radar-list-item"><span className="radar-num"><GitBranch size={14}/></span><div><strong>Carteira não é identidade</strong><p>Endereço público ajuda a seguir transações, mas não revela automaticamente pessoa, empresa, país ou fonte econômica original.</p></div></div>
