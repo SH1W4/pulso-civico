@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import ElectionDashboard from "./components/election-dashboard";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -159,6 +160,8 @@ export default function Home() {
         <div><span className="manifesto-index">02 / MÉTODO</span><strong>Incerteza visível</strong></div>
         <div><span className="manifesto-index">03 / AUTONOMIA</span><strong>Leitura independente</strong></div>
       </section>
+
+      <ElectionDashboard />
 
       <section className="launch-explore" id="explorar">
         <div className="launch-section-heading">
