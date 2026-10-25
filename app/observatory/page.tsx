@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Activity, ArrowUpRight, BookOpen, CircleHelp, Filter, GitBranch, Info, Search, ShieldCheck, Share2, Plus, ExternalLink, Network } from "lucide-react";
+import { Activity, ArrowUpRight, BookOpen, CircleHelp, Filter, GitBranch, Info, Search, ShieldCheck, Share2, Plus, ExternalLink, Network, FileSearch } from "lucide-react";
 
-type View = "overview" | "graph" | "evidence" | "hypotheses" | "sources";
+type View = "overview" | "graph" | "table" | "evidence" | "hypotheses" | "sources";
 type Status = "Verificado" | "Corroborado" | "Indício" | "Inconclusivo";
 
 const sections: { id: View; label: string; icon: typeof Activity }[] = [
   { id: "overview", label: "Resumo executivo", icon: Activity },
   { id: "graph", label: "Mapa de relações", icon: Network },
+  { id: "table", label: "Tabela de evidências", icon: FileSearch },
   { id: "evidence", label: "Evidências e método", icon: ShieldCheck },
   { id: "hypotheses", label: "Hipóteses", icon: GitBranch },
   { id: "sources", label: "Fontes", icon: BookOpen },
@@ -96,6 +97,14 @@ export default function ObservatoryPage() {
         .obs-number{font-size:28px;font-weight:800;letter-spacing:-.05em}.obs-muted{font-size:10px;line-height:1.7;color:var(--muted)}.obs-button{display:inline-flex;align-items:center;gap:7px;border:1px solid #3c4b3c;background:#182219;color:var(--lime);border-radius:8px;padding:9px 11px;font-size:10px;cursor:pointer}.obs-button:hover{background:#223022}.obs-hyp-list{display:grid;gap:8px}.obs-hyp{width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;color:var(--text);cursor:pointer}.obs-hyp.active{border-color:#829c5c;background:#172116}.obs-hyp strong{font-size:11px}.obs-hyp p{font-size:10px;line-height:1.7;color:var(--muted);margin:7px 0}.obs-hyp small{color:var(--lime);font-size:9px}
         .obs-search{display:flex;align-items:center;gap:8px;border:1px solid #3a493d;border-radius:8px;padding:0 10px;margin-bottom:12px}.obs-search input{min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);padding:11px 0;font:inherit;font-size:10px}.obs-filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.obs-filter{border:1px solid var(--line);background:#0c120e;color:var(--muted);border-radius:7px;padding:7px 9px;font-size:9px;cursor:pointer}.obs-filter.active{border-color:#6b8249;color:var(--lime)}.obs-source{padding:13px 0;border-bottom:1px solid #253128}.obs-source:last-child{border-bottom:0}.obs-source strong{font-size:11px}.obs-source p{font-size:10px;line-height:1.7;color:var(--muted);margin:6px 0}.obs-source-meta{font-size:9px;color:#89988c;margin-top:4px}
         
+        .evidence-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+        .evidence-table{width:100%;border-collapse:collapse;min-width:650px;font-size:11px}
+        .evidence-table th{text-align:left;padding:12px;background:#111611;color:var(--muted);font:9px "DM Mono",monospace;text-transform:uppercase;letter-spacing:.08em}
+        .evidence-table td{padding:13px 12px;border-top:1px solid var(--line);vertical-align:top}
+        .evidence-table td strong{display:block;font-size:11px;margin-bottom:4px}
+        .evidence-table td p{color:var(--muted);font-size:10px;line-height:1.6;margin:0}
+        .evidence-table a{color:var(--lime);white-space:nowrap}
+        .table-kind{display:inline-block;border:1px solid #3b4938;border-radius:5px;padding:4px 6px;color:#d3e4c5;font-size:9px}
         .graph-workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:stretch}
         .graph-canvas{position:relative;min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:13px;background:radial-gradient(circle at 50% 45%,#26342355,transparent 55%),#0b100d}
         .graph-canvas svg{display:block;width:100%;height:auto;min-height:400px}
@@ -137,6 +146,15 @@ export default function ObservatoryPage() {
             </div>
             <div className="obs-alert"><Info size={15}/><span><strong>Limite atual:</strong> esta é uma interface de protótipo. Nenhuma ingestão automática ou série histórica está conectada. Portanto, não apresentamos números de atividade, alertas ou conclusões como se tivessem sido medidos.</span></div>
 
+            {view==="table" && <>
+              <h2 className="obs-section-title">Registros para inspeção</h2>
+              <p className="obs-intro">Fontes candidatas e perguntas de investigação que estão definidas no protótipo. A inclusão nesta tabela não significa que a fonte tenha sido consultada hoje ou que uma hipótese esteja confirmada.</p>
+              <div className="evidence-table-wrap"><table className="evidence-table"><thead><tr><th>Item</th><th>Tipo</th><th>Estado</th><th>Descrição / pergunta</th><th>Origem</th></tr></thead><tbody>
+                {sources.map((source,i)=><tr key={source.name}><td><strong>{source.name}</strong><p>{source.role}</p></td><td><span className="table-kind">Fonte candidata</span></td><td><span className="table-kind">Consulta não verificada hoje</span></td><td><p>{source.detail}</p></td><td><a href={source.url} target="_blank" rel="noreferrer">Abrir fonte ↗</a></td></tr>)}
+                {hypotheses.map(h=><tr key={h.id}><td><strong>{h.id} · {h.title}</strong><p>Hipótese de investigação</p></td><td><span className="table-kind">Hipótese</span></td><td><span className="table-kind">Em aberto</span></td><td><p>{h.question}<br/><br/><strong>Método:</strong> {h.method}</p></td><td><span className="table-kind">Requer evidência</span></td></tr>)}
+              </tbody></table></div>
+              <div className="obs-alert"><Info size={15}/><span>Esta tabela é um inventário do protótipo, não um registro de evidências coletadas em tempo real. Consulte a origem e registre data, método e limitações antes de publicar conclusões.</span></div>
+            </>}
             {view==="graph" && <>
               <h2 className="obs-section-title">Mapa de relações</h2>
               <p className="obs-intro">Explore como perguntas de investigação se relacionam com fontes candidatas e critérios de método. Selecione um nó para inspecionar sua origem e contexto.</p>
