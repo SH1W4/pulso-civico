@@ -20,7 +20,7 @@ Não execute migrações de produção sem backup e revisão do procedimento ope
 
 ## Configuração
 
-Configure DATABASE_URL e SOURCE_MODERATION_TOKEN no ambiente de execução. Use um segredo aleatório, longo e exclusivo por ambiente. Nunca use prefixo NEXT_PUBLIC_ para esse segredo.
+Configure DATABASE_URL, SOURCE_MODERATION_TOKEN e SOURCE_SUBMISSIONS_ENABLED no ambiente de execução. Mantenha SOURCE_SUBMISSIONS_ENABLED=false até aplicar a migração, revisar a política de privacidade/retensão e configurar proteção contra abuso. Para ativar o recebimento, defina SOURCE_SUBMISSIONS_ENABLED=true. Use um segredo aleatório, longo e exclusivo por ambiente. Nunca use prefixo NEXT_PUBLIC_ para esse segredo.
 
 O token autoriza a consulta da fila pendente via GET /api/source-submissions?status=pending e a moderação via PATCH /api/source-submissions.
 
