@@ -31,7 +31,6 @@ SESSION.headers.update({
     "Accept": "application/json, text/csv, text/html, */*",
 })
 OUT = BASE / datetime.now(TZ).strftime("%Y%m%d_%H%M%S")
-OUT.mkdir(parents=True, exist_ok=False)
 
 
 def now_local() -> str:
@@ -302,6 +301,7 @@ def fetch_tse(manifest: dict) -> None:
 
 
 def main() -> None:
+    OUT.mkdir(parents=True, exist_ok=False)
     manifest = {
         "project": "Pulso Cívico",
         "collector_version": "0.2",
