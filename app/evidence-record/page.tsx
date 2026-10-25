@@ -81,7 +81,7 @@ export default function EvidenceRecordPage() {
   function exportCsv() {
     const csv = [
       "record_id,observed_at,source_name,source_url,claim,verification_status,notes",
-      "PC-ELECTION-001,,,,,,,",
+      "PC-ELECTION-001,,,,,,",
     ].join("\n");
     saveFile("pulso-civico-evidence-observations-template.csv", csv, "text/csv;charset=utf-8");
     setMessage("Modelo CSV exportado. Nenhuma observação foi preenchida ou presumida.");
