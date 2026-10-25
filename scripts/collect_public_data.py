@@ -23,6 +23,7 @@ BASE = Path("data-collection")
 TIMEOUT = (15, 90)
 MAX_ZIP_MEMBERS = 20_000
 MAX_UNCOMPRESSED_BYTES = 2 * 1024 * 1024 * 1024
+MAX_DOWNLOAD_BYTES = 512 * 1024 * 1024
 MAX_MARKET_PAGES = 5
 PAGE_SIZE = 100
 SESSION = requests.Session()
@@ -50,8 +51,7 @@ def write_json(path: Path, value: object) -> None:
 
 
 def safe_extract_zip(archive: Path, destination: Path) -> list[Path]:
-    """Extract ZIP members only if names and declared sizes are within limits."""
-    destination.mkdir(parents=True, exist_ok=True)
+    """Validate every ZIP member before writing any extracted file."""
     root = destination.resolve()
     extracted: list[Path] = []
     with zipfile.ZipFile(archive) as zf:
@@ -64,13 +64,21 @@ def safe_extract_zip(archive: Path, destination: Path) -> list[Path]:
         total = sum(item.file_size for item in infos)
         if total > MAX_UNCOMPRESSED_BYTES:
             raise ValueError(f"ZIP exceeds uncompressed-size limit: {total}")
+
+        # Preflight all paths before creating directories or files. A malicious
+        # late member must not leave earlier members partially extracted.
+        validated: list[tuple[zipfile.ZipInfo, Path]] = []
         for info in infos:
             member = PurePosixPath(info.filename)
-            if member.is_absolute() or ".." in member.parts:
+            if member.is_absolute() or ".." in member.parts or "\\\\" in info.filename:
                 raise ValueError(f"Unsafe ZIP member path: {info.filename}")
             target = (destination / Path(*member.parts)).resolve()
             if target != root and root not in target.parents:
                 raise ValueError(f"ZIP member escapes destination: {info.filename}")
+            validated.append((info, target))
+
+        destination.mkdir(parents=True, exist_ok=True)
+        for info, target in validated:
             if info.is_dir():
                 target.mkdir(parents=True, exist_ok=True)
                 continue
@@ -116,11 +124,33 @@ def fetch_to_file(name: str, url: str, suffix: str, manifest: dict) -> Path | No
                 etag=response.headers.get("etag"),
             )
             response.raise_for_status()
+            declared_length = response.headers.get("content-length")
+            if declared_length:
+                try:
+                    if int(declared_length) > MAX_DOWNLOAD_BYTES:
+                        raise ValueError(
+                            f"Download exceeds size limit: {declared_length} > {MAX_DOWNLOAD_BYTES}"
+                        )
+                except ValueError as exc:
+                    if "Download exceeds size limit" in str(exc):
+                        raise
+                    # Ignore malformed Content-Length; enforce the streaming limit below.
             path = OUT / f"{name}{suffix}"
-            with path.open("wb") as stream:
-                for chunk in response.iter_content(256 * 1024):
-                    if chunk:
+            bytes_written = 0
+            try:
+                with path.open("wb") as stream:
+                    for chunk in response.iter_content(256 * 1024):
+                        if not chunk:
+                            continue
+                        bytes_written += len(chunk)
+                        if bytes_written > MAX_DOWNLOAD_BYTES:
+                            raise ValueError(
+                                f"Download exceeds size limit: more than {MAX_DOWNLOAD_BYTES} bytes"
+                            )
                         stream.write(chunk)
+            except (OSError, ValueError):
+                path.unlink(missing_ok=True)
+                raise
             record.update(
                 result="downloaded",
                 file=str(path),
