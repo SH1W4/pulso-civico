@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   try {
     const result = includePending
       ? await getPool().query<SourceRow>(
-          "SELECT id::text, url, normalized_url, category, note, status, moderation_note, created_at, updated_at FROM source_submissions WHERE status <> 'APPROVED' ORDER BY created_at DESC LIMIT 200",
+          "SELECT id::text, url, normalized_url, category, note, status, moderation_note, created_at, updated_at FROM source_submissions WHERE status IN ('PENDING', 'NEEDS_REVIEW') ORDER BY created_at DESC LIMIT 200",
         )
       : await getPool().query<SourceRow>(
           "SELECT id::text, url, normalized_url, category, note, status, moderation_note, created_at, updated_at FROM source_submissions WHERE status = 'APPROVED' ORDER BY updated_at DESC LIMIT 200",
@@ -92,6 +92,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (process.env.SOURCE_SUBMISSIONS_ENABLED !== "true") {
+    return jsonError("O recebimento de fontes está temporariamente desabilitado.", 503);
+  }
   let body: { url?: unknown; category?: unknown; note?: unknown };
   try {
     body = await request.json();
