@@ -96,6 +96,8 @@ class CollectorTests(unittest.TestCase):
             with patch.object(collector, "OUT", out), patch.object(collector, "MAX_DOWNLOAD_BYTES", 4):
                 out.mkdir()
                 response = MagicMock()
+                response.__enter__.return_value = response
+                response.__exit__.return_value = False
                 response.status_code = 200
                 response.headers = {"content-length": "5", "content-type": "application/octet-stream"}
                 response.raise_for_status.return_value = None
@@ -147,6 +149,8 @@ class CollectorTests(unittest.TestCase):
             with patch.object(collector, "OUT", out):
                 out.mkdir()
                 response = MagicMock()
+                response.__enter__.return_value = response
+                response.__exit__.return_value = False
                 response.status_code = 503
                 response.headers = {"content-type": "text/plain"}
                 response.raise_for_status.side_effect = requests.HTTPError("503 Service Unavailable")
