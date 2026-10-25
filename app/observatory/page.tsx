@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  Activity, ArrowDownLeft, ArrowUpRight, BarChart3, ChevronDown, CircleHelp,
-  Clock3, ExternalLink, FileSearch, Filter, GitBranch, Info, Layers3, Newspaper,
-  Search, ShieldCheck, Wallet, X,
+  Activity, CircleHelp, ExternalLink, FileSearch, Filter, GitBranch, Info,
+  Layers3, Newspaper, Search, ShieldCheck, Wallet,
 } from "lucide-react";
 
 type View = "overview" | "flows" | "narrative" | "actors" | "dossiers";
@@ -76,7 +75,6 @@ export default function ObservatoryPage() {
   const [filter, setFilter] = useState("Todos");
   const [search, setSearch] = useState("");
   const [selectedHypothesis, setSelectedHypothesis] = useState("H1");
-  const [showLimits, setShowLimits] = useState(true);
   const filteredSources = useMemo(() => sources.filter(s => (filter==="Todos" || s.kind===filter) && (s.name+" "+s.detail+" "+s.kind).toLowerCase().includes(search.toLowerCase())), [filter, search]);
 
   return <main className="obs-shell">
