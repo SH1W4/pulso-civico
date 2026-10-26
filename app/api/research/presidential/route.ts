@@ -1,7 +1,7 @@
 import AdmZip from "adm-zip";
 import { parse } from "csv-parse/sync";
 import { NextResponse } from "next/server";
-import { isNationalResearch, parseSampleSize } from "@/lib/research-validation";
+import { parsePresidentialResearchRows, type ResearchCsvRow } from "@/lib/research-parser";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,36 +12,31 @@ const TSE_DATASET_PAGE =
   "https://dadosabertos.tse.jus.br/dataset/pesquisas-eleitorais-2026";
 const PESQELE_URL = "https://pesqele-divulgacao.tse.jus.br/";
 const MAX_DOWNLOAD_BYTES = 80 * 1024 * 1024;
+const MAX_ARCHIVE_UNCOMPRESSED_BYTES = 160 * 1024 * 1024;
 
 type CkanResource = { name?: string; format?: string; url?: string; mimetype?: string; last_modified?: string };
-type CsvRow = Record<string, string>;
+type CsvRow = ResearchCsvRow;
 
-function key(value: string): string {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-}
-
-function field(row: CsvRow, ...aliases: string[]): string {
-  const normalized = new Map(Object.entries(row).map(([name, value]) => [key(name), String(value ?? "").trim()]));
-  for (const alias of aliases) {
-    const value = normalized.get(key(alias));
-    if (value) return value;
+async function readLimitedBody(response: Response, maxBytes: number): Promise<Buffer> {
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("A fonte oficial retornou uma resposta sem corpo legível.");
+  const chunks: Buffer[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel();
+        throw new Error("O arquivo oficial excede o limite de processamento.");
+      }
+      chunks.push(Buffer.from(value));
+    }
+  } finally {
+    reader.releaseLock();
   }
-  return "";
-}
-
-function parseDate(value: string): string | null {
-  if (!value) return null;
-  const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (match) return `${match[3]}-${match[2]}-${match[1]}`;
-  const iso = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  return iso ? `${iso[1]}-${iso[2]}-${iso[3]}` : null;
-}
-
-function presidential(row: CsvRow): boolean {
-  const office = field(row, "DS_CARGO", "NM_CARGO", "CARGO", "DS_CARGO_PESQUISA");
-  const state = field(row, "SG_UF", "UF", "SG_UF_PESQUISA");
-  const scope = field(row, "TP_ABRANGENCIA", "DS_ABRANGENCIA", "ABRANGENCIA");
-  return isNationalResearch(office, state, scope);
+  return Buffer.concat(chunks, totalBytes);
 }
 
 export async function GET() {
@@ -74,16 +69,24 @@ export async function GET() {
     if (!fileResponse.ok) throw new Error("Não foi possível baixar o arquivo oficial de pesquisas.");
     const declaredSize = Number(fileResponse.headers.get("content-length") ?? 0);
     if (declaredSize > MAX_DOWNLOAD_BYTES) throw new Error("O arquivo oficial excede o limite de processamento.");
-    const archiveBuffer = Buffer.from(await fileResponse.arrayBuffer());
-    if (archiveBuffer.byteLength > MAX_DOWNLOAD_BYTES) {
-      throw new Error("O arquivo oficial excede o limite de processamento.");
-    }
+    const archiveBuffer = await readLimitedBody(fileResponse, MAX_DOWNLOAD_BYTES);
 
     const archive = new AdmZip(archiveBuffer);
-    const csvEntry = archive.getEntries().find((entry) =>
+    const entries = archive.getEntries();
+    const declaredUncompressedBytes = entries.reduce(
+      (sum, entry) => sum + Math.max(0, Number(entry.header.size) || 0),
+      0,
+    );
+    if (declaredUncompressedBytes > MAX_ARCHIVE_UNCOMPRESSED_BYTES) {
+      throw new Error("O conteúdo descompactado excede o limite de processamento.");
+    }
+    const csvEntry = entries.find((entry) =>
       !entry.isDirectory && /\.(csv|txt)$/i.test(entry.entryName),
     );
     if (!csvEntry) throw new Error("O arquivo compactado não contém CSV/TXT reconhecível.");
+    if (Number(csvEntry.header.size) > MAX_DOWNLOAD_BYTES) {
+      throw new Error("O CSV descompactado excede o limite de processamento.");
+    }
 
     const text = csvEntry.getData().toString("latin1");
     const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
@@ -97,18 +100,7 @@ export async function GET() {
       trim: true,
     }) as CsvRow[];
 
-    const polls = rows.filter(presidential).map((row) => ({
-      registration: field(row, "NR_PESQUISA", "NR_REGISTRO", "DS_REGISTRO", "CD_REGISTRO") || "Registro não identificado",
-      institute: field(row, "NM_EMPRESA", "NM_ENTIDADE", "NM_EMPRESA_PESQUISA", "EMPRESA") || "Instituto não informado",
-      contractor: field(row, "NM_ENTIDADE", "NM_CONTRATANTE", "CONTRATANTE") || null,
-      registeredAt: parseDate(field(row, "DT_REGISTRO", "DT_CADASTRO")),
-      publishableAt: parseDate(field(row, "DT_DIVULGACAO", "DT_PREVISTA_DIVULGACAO", "DT_DIVULGACAO_PREVISTA")),
-      fieldStart: parseDate(field(row, "DT_INICIO_PESQUISA", "DT_INICIO", "DT_INICIO_CAMPO")),
-      fieldEnd: parseDate(field(row, "DT_FIM_PESQUISA", "DT_FIM", "DT_FIM_CAMPO")),
-      sampleSize: Number(field(row, "QT_ENTREVISTADOS", "QT_AMOSTRA", "QT_ENTREVISTAS", "AMOSTRA").replace(/\D/g, "")) || null,
-      state: field(row, "SG_UF", "UF") || "BR",
-      status: field(row, "DS_SITUACAO", "DS_STATUS", "SITUACAO") || null,
-    })).sort((a, b) => (b.registeredAt ?? "").localeCompare(a.registeredAt ?? ""));
+    const polls = parsePresidentialResearchRows(rows);
 
     if (polls.length === 0) {
       return NextResponse.json({
