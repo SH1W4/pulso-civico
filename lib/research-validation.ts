@@ -1,5 +1,5 @@
 export function normalizeKey(value: string): string {
-  return value.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
 export function isNationalResearch(office: string, state: string, scope: string): boolean {
@@ -19,7 +19,7 @@ export function parseSampleSize(value: string): number | null {
   if (!trimmed) return null;
   // Accept plain integers or Brazilian thousands separators (e.g. 2.000),
   // but reject arbitrary text and ambiguous decimal values.
-  if (!/^(?:\\d+|\\d{1,3}(?:\\.\\d{3})+)$/.test(trimmed)) return null;
-  const parsed = Number(trimmed.replace(/\\./g, ""));
+  if (!/^(?:\d+|\d{1,3}(?:\.\d{3})+)$/.test(trimmed)) return null;
+  const parsed = Number(trimmed.replace(/\./g, ""));
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
 }
