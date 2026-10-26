@@ -1,6 +1,7 @@
 import AdmZip from "adm-zip";
 import { parse } from "csv-parse/sync";
 import { NextResponse } from "next/server";
+import { isNationalResearch, parseSampleSize } from "@/lib/research-validation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,10 +41,7 @@ function presidential(row: CsvRow): boolean {
   const office = field(row, "DS_CARGO", "NM_CARGO", "CARGO", "DS_CARGO_PESQUISA");
   const state = field(row, "SG_UF", "UF", "SG_UF_PESQUISA");
   const scope = field(row, "TP_ABRANGENCIA", "DS_ABRANGENCIA", "ABRANGENCIA");
-  const isPresident = key(office).includes("PRESIDENT");
-  const isNational = !state || ["BR", "BRASIL", "NACIONAL", "PAIS"].includes(key(state)) ||
-    key(scope).includes("NACIONAL") || key(scope).includes("BRASIL");
-  return isPresident && isNational;
+  return isNationalResearch(office, state, scope);
 }
 
 export async function GET() {
@@ -95,7 +93,7 @@ export async function GET() {
       delimiter,
       bom: true,
       skip_empty_lines: true,
-      relax_column_count: true,
+      relax_column_count: false,
       trim: true,
     }) as CsvRow[];
 
