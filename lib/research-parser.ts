@@ -16,7 +16,7 @@ export type PresidentialResearchRecord = {
 };
 
 function normalizeColumn(value: string): string {
-  return value.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
 function field(row: ResearchCsvRow, ...aliases: string[]): string {
@@ -32,9 +32,9 @@ function field(row: ResearchCsvRow, ...aliases: string[]): string {
 
 function parseDate(value: string): string | null {
   if (!value) return null;
-  const brazilian = value.match(/^(\\d{2})\\/(\\d{2})\\/(\\d{4})$/);
+  const brazilian = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (brazilian) return `${brazilian[3]}-${brazilian[2]}-${brazilian[1]}`;
-  const iso = value.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+  const iso = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   return iso ? `${iso[1]}-${iso[2]}-${iso[3]}` : null;
 }
 
